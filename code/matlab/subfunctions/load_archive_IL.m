@@ -1,220 +1,144 @@
 %% load_archive_IL
 % Sub-function of IsraelTuna.m; loads data from recovered tags.
 
-%% Go to folder.
+% %% Go to folder.
+%
+% %%% Currently, there are no DC files from the Turkey series.
+% %%% Create an empty DC dir unless it already exists (mkdir -p does this).
+% %%% This should be harmless even if DC files are there in the future.
+%
+% system(['mkdir -p ' fdir '/data/dc']);
+%
+% cd([fdir '/data/dc']);
 
-cd([fdir '/data/dc']);
+%% Get list of files, butg insteadd of using /data/dc, get from /TOPP
 
-%% Get list of files.
 
-files = dir('*DC*.csv');
 
 %% Loop through files.
 
-for i = 1:length(files)
+PSAT=cell(height(META),1); % empty placeholder cell array to hold tables
+for i = 1:height(META)
+    row=META(i,:);
+    file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'DC.csv');
 
-    disp(i)
 
-    if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
+    % file is dervied from META so no need to skip files not in META
+    % (there are none)
+    % if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
+    %     continue
+    % end
+    %
+    % BUT CONVERSELY, THERE ARE SOME ROWS IN META WITH NO DC FILE,
+    % SO WE HAVE TO DO THE REVERSE CHECK
+
+    if exist(file,'file') == 0
         continue
     end
 
-    if exist('PSAT','var') == 0
 
-        %% Load data.
 
-        PSAT = readtable(files(i).name);
-        PSAT = PSAT(:,[3:4 6 8:13]);
+    %% Load data.
 
-        PSAT.Properties.VariableNames = {'Depth' 'LightLevel' 'Temperature',...
-            'Year' 'Month' 'Day' 'Hour' 'Min' 'Sec'};
+    tmp = readtable(file);
 
-        PSAT.DateTime = datetime(PSAT.Year,PSAT.Month,PSAT.Day,...
-            PSAT.Hour,PSAT.Min,PSAT.Sec);
-        PSAT(:,4:9) = [];
-        PSAT = movevars(PSAT, 'DateTime', 'Before', 'Depth');
 
-        PSAT.TOPPID = str2double(files(i).name(1:7))*ones(size(PSAT,1),1);
-        PSAT = movevars(PSAT, 'TOPPID', 'Before', 'DateTime');
 
-        %% Remove data before deployment date.
 
-        PSAT(PSAT.DateTime <= META.taggingdate(META.toppID == PSAT.TOPPID(1)),:) = [];
+    tmp = tmp(:,[3:4 6 8:13]);
 
-        %% Remove data after first date of "last" or manual.
+    tmp.Properties.VariableNames = {'Depth' 'LightLevel' 'Temperature',...
+        'Year' 'Month' 'Day' 'Hour' 'Min' 'Sec'};
 
-        date_rm = min([META.popdate(META.toppID == PSAT.TOPPID(1)),...
-            META.recdate(META.toppID == PSAT.TOPPID(1)), ...
-            META.date_last_depth(META.toppID == PSAT.TOPPID(1)), ...
-            META.date_last_light(META.toppID == PSAT.TOPPID(1)), ...
-            META.date_last_lon(META.toppID == PSAT.TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == PSAT.TOPPID(1))]);
+    tmp.DateTime = datetime(tmp.Year,tmp.Month,tmp.Day,...
+        tmp.Hour,tmp.Min,tmp.Sec);
+    tmp(:,4:9) = [];
+    tmp = movevars(tmp, 'DateTime', 'Before', 'Depth');
 
-        PSAT(PSAT.DateTime >= date_rm,:) = [];
+    tmp.TOPPID(:) = row.toppID;
+    tmp = movevars(tmp, 'TOPPID', 'Before', 'DateTime');
 
-        clear date_rm
+    %% Remove data before deployment date.
 
-        %% Remove data after last SSM date.
+    tmp(tmp.DateTime < row.taggingdate,:) = [];
 
-        PSAT(PSAT.DateTime > max(SSM.Date(SSM.TOPPID == PSAT.TOPPID(1))),:) = [];
+    %% Remove data after first date of "last" or manual.
 
-        %% Time Zone Correction
- 
-        if META.timezone_correction(META.toppID == PSAT.TOPPID(1)) >= 0
-            tz = ['+0' num2str(META.timezone_correction(META.toppID == PSAT.TOPPID(1))) ':00'];
-        else
-            tz = ['-0' num2str(abs(META.timezone_correction(META.toppID == PSAT.TOPPID(1)))) ':00'];
-        end
-        PSAT.DateTime.TimeZone = tz;
-        clear tz
+    date_rm = min([row.popdate,...
+        row.recdate, ...
+        row.date_last_depth, ...
+        row.date_last_light, ...
+        row.date_last_lon, ...
+        row.manual_cut_date]);
 
-        PSAT.DateTime.TimeZone = 'UTC';
+    tmp(tmp.DateTime >= date_rm,:) = [];
 
-        PSAT.Date = datetime(year(PSAT.DateTime),month(PSAT.DateTime),day(PSAT.DateTime));
-        PSAT = movevars(PSAT, 'Date', 'Before', 'Depth');
+    %% Remove data after last SSM date.
 
-        %% Interpolate SSM positions to match PSAT data.
+    tmp(tmp.DateTime > max(SSM.Date(SSM.TOPPID == row.toppID)),:) = [];
 
-        PSAT.Longitude = interp1(datenum(SSM.Date(SSM.TOPPID == PSAT.TOPPID(1))),...
-            SSM.Longitude(SSM.TOPPID == PSAT.TOPPID(1)),datenum(PSAT.DateTime));
+    %% Time Zone Correction
 
-        PSAT.Latitude = interp1(datenum(SSM.Date(SSM.TOPPID == PSAT.TOPPID(1))),...
-            SSM.Latitude(SSM.TOPPID == PSAT.TOPPID(1)),datenum(PSAT.DateTime));
 
-        %% Remove values outside of the Med.
-
-        ind = PSAT.Longitude <= -5.6061;
-        PSAT(ind,:) = [];
-
-        ind = PSAT.Latitude >= 46;
-        PSAT(ind,:) = [];
-
-        %% Determine season.
-
-        % 1 = Fall which includes September, October and November.
-        % 2 = Winter which includes December, January and February.
-        % 3 = Spring which includes March, April and May.
-        % 4 = Summer which includes June, July and August.
-
-        PSAT.Season = zeros(length(PSAT.Latitude),1);
-        PSAT.Season(month(PSAT.DateTime) == 9 | month(PSAT.DateTime) == 10 | month(PSAT.DateTime) == 11) = 1;
-        PSAT.Season(month(PSAT.DateTime) == 12 | month(PSAT.DateTime) == 1 | month(PSAT.DateTime) == 2) = 2;
-        PSAT.Season(month(PSAT.DateTime) == 3 | month(PSAT.DateTime) == 4 | month(PSAT.DateTime) == 5) = 3;
-        PSAT.Season(month(PSAT.DateTime) == 6 | month(PSAT.DateTime) == 7 | month(PSAT.DateTime) == 8) = 4;
-
-        %% Determine hotspot.
-
-        PSAT.Region = zeros(height(PSAT.TOPPID),1);
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Adriatic(:,1),regions.Adriatic(:,2))) = 3;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Ionian(:,1),regions.Ionian(:,2))) = 4;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Tunisian(:,1),regions.Tunisian(:,2))) = 5;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
-        PSAT.Region(inpolygon(PSAT.Longitude,PSAT.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
-
+    if row.timezone_correction > 0
+        tz = ['+0' num2str(row.timezone_correction) ':00'];
+    else if row.timezone_correction < 0
+            tz = ['-0' num2str(abs(row.timezone_correction)) ':00'];
     else
-
-        %% Load data.
-
-        tmp = readtable(files(i).name);
-        tmp = tmp(:,[3:4 6 8:13]);
-
-        tmp.Properties.VariableNames = {'Depth' 'LightLevel' 'Temperature',...
-            'Year' 'Month' 'Day' 'Hour' 'Min' 'Sec'};
-
-        tmp.DateTime = datetime(tmp.Year,tmp.Month,tmp.Day,...
-            tmp.Hour,tmp.Min,tmp.Sec);
-        tmp(:,4:9) = [];
-        tmp = movevars(tmp, 'DateTime', 'Before', 'Depth');
-
-        tmp.TOPPID = str2double(files(i).name(1:7))*ones(size(tmp,1),1);
-        tmp = movevars(tmp, 'TOPPID', 'Before', 'DateTime');
-
-        %% Remove data before deployment date.
-
-        tmp(tmp.DateTime <= META.taggingdate(META.toppID == tmp.TOPPID(1)),:) = [];
-
-        %% Remove data after first date of "last" or manual.
-
-        date_rm = min([META.popdate(META.toppID == tmp.TOPPID(1)),...
-            META.recdate(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_depth(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_light(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_lon(META.toppID == tmp.TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == tmp.TOPPID(1))]);
-
-        tmp(tmp.DateTime >= date_rm,:) = [];
-
-        clear date_rm
-
-        %% Remove data after last SSM date.
-
-        tmp(tmp.DateTime > max(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),:) = [];
-
-        %% Time Zone Correction
- 
-        if META.timezone_correction(META.toppID == tmp.TOPPID(1)) >= 0
-            tz = ['+0' num2str(META.timezone_correction(META.toppID == tmp.TOPPID(1))) ':00'];
-        else
-            tz = ['-0' num2str(abs(META.timezone_correction(META.toppID == tmp.TOPPID(1)))) ':00'];
-        end
-        tmp.DateTime.TimeZone = tz;
-        clear tz
-
-        tmp.DateTime.TimeZone = 'UTC';
-
-        tmp.Date = datetime(year(tmp.DateTime),month(tmp.DateTime),day(tmp.DateTime));
-        tmp = movevars(tmp, 'Date', 'Before', 'Depth');
-
-        %% Interpolate SSM positions to match PSAT data.
-
-        tmp.Longitude = interp1(datenum(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),...
-            SSM.Longitude(SSM.TOPPID == tmp.TOPPID(1)),datenum(tmp.DateTime));
-
-        tmp.Latitude = interp1(datenum(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),...
-            SSM.Latitude(SSM.TOPPID == tmp.TOPPID(1)),datenum(tmp.DateTime));
-
-        %% Remove values outside of the Med.
-
-        ind = tmp.Longitude <= -5.6061;
-        tmp(ind,:) = [];
-
-        ind = tmp.Latitude >= 46;
-        tmp(ind,:) = [];
-
-        %% Determine season.
-
-        tmp.Season = zeros(length(tmp.Latitude),1);
-        tmp.Season(month(tmp.DateTime) == 9 | month(tmp.DateTime) == 10 | month(tmp.DateTime) == 11) = 1;
-        tmp.Season(month(tmp.DateTime) == 12 | month(tmp.DateTime) == 1 | month(tmp.DateTime) == 2) = 2;
-        tmp.Season(month(tmp.DateTime) == 3 | month(tmp.DateTime) == 4 | month(tmp.DateTime) == 5) = 3;
-        tmp.Season(month(tmp.DateTime) == 6 | month(tmp.DateTime) == 7 | month(tmp.DateTime) == 8) = 4;
-
-        %% Determine hotspot.
-
-        tmp.Region = zeros(height(tmp.TOPPID),1);
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Adriatic(:,1),regions.Adriatic(:,2))) = 3;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Ionian(:,1),regions.Ionian(:,2))) = 4;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Tunisian(:,1),regions.Tunisian(:,2))) = 5;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
-        tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
-
-        %% Combine tables.
-
-        PSAT = [PSAT; tmp];
-
-        clear tmp
+        tz = 'UTC'; % 0 or NaN
     end
 
-    clear TOPPID
+    tmp.DateTime.TimeZone = tz;
 
+    tmp.Date = datetime(year(tmp.DateTime),month(tmp.DateTime),day(tmp.DateTime));
+    tmp = movevars(tmp, 'Date', 'Before', 'Depth');
+    if (height(tmp)==  0)
+        continue % tmp is empty -- probably no SSM? -- skip this deployment
+    end
+    %% Interpolate SSM positions to match tmp data.
+
+    tmp.Longitude = interp1(datenum(SSM.Date(SSM.TOPPID == row.toppID)),...
+        SSM.Longitude(SSM.TOPPID == row.toppID),datenum(tmp.DateTime));
+
+    tmp.Latitude = interp1(datenum(SSM.Date(SSM.TOPPID == row.toppID)),...
+        SSM.Latitude(SSM.TOPPID == row.toppID),datenum(tmp.DateTime));
+
+    %% Remove values outside of the Med.
+
+    ind = tmp.Longitude <= -5.6061;
+    tmp(ind,:) = [];
+
+    ind = tmp.Latitude >= 46;
+    tmp(ind,:) = [];
+
+    %% Determine season.
+
+    % 1 = Fall which includes September, October and November.
+    % 2 = Winter which includes December, January and February.
+    % 3 = Spring which includes March, April and May.
+    % 4 = Summer which includes June, July and August.
+
+    tmp.Season = zeros(length(tmp.Latitude),1);
+    tmp.Season(month(tmp.DateTime) == 9 | month(tmp.DateTime) == 10 | month(tmp.DateTime) == 11) = 1;
+    tmp.Season(month(tmp.DateTime) == 12 | month(tmp.DateTime) == 1 | month(tmp.DateTime) == 2) = 2;
+    tmp.Season(month(tmp.DateTime) == 3 | month(tmp.DateTime) == 4 | month(tmp.DateTime) == 5) = 3;
+    tmp.Season(month(tmp.DateTime) == 6 | month(tmp.DateTime) == 7 | month(tmp.DateTime) == 8) = 4;
+
+    %% Determine hotspot.
+
+    tmp.Region = zeros(height(tmp.TOPPID),1);
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Adriatic(:,1),regions.Adriatic(:,2))) = 3;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Ionian(:,1),regions.Ionian(:,2))) = 4;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Tunisian(:,1),regions.Tunisian(:,2))) = 5;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
+    tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Black(:,1),regions.Black(:,2))) = 8;
+    PSAT{i}=tmp;
+    end
 end
-clear i
-
-clear files
+PSAT=cat(1,PSAT{:});
 
 PSAT.Date.TimeZone = 'UTC';
 

@@ -1,0 +1,9 @@
+eventid,tagnumber,ptt,taggingdate,seriesname,deploylat,deploylon,length,length_type,popdate,poplat,poplon,recdate,reclat,reclon,recovered,archivaldata,tagmodel,manufacturer,sample_rate,date_last_depth,date_last_light,date_last_itemp,date_last_etemp,date_last_lon,stock,timezone_correction,tagowner,project,manual_cut_date,Comments
+511700100,16P1986,166395,6/15/2017,Israel 2017,31.981,34.41,135,CFL,11/12/2017,32.838,14.519,,,,,,miniPAT,Wildlife,,,11/6/2017,,,11/6/2017,MED,,MBAYAQ,TAG,11/6/2017,
+511700200,16P1962,152985,6/15/2017,Israel 2017,32.04,34.28,125,CFL,12/13/2017,41.278,12.659,12/17/2017,41.427981,12.735794,tag recovered,archdata,miniPAT,Wildlife,,,,,,,MED,0,MBAYAQ,TAG,,
+511800100,17P1360,61845,6/11/2018,Israel 2018,32.224,34.541,141,CFL,1/10/2019,32.0334,31.4827,,,,,,miniPAT,Wildlife,,,,,,,MED,,Israel,TAG,1/2/2019,
+511801000,14P0396,177337,9/28/2018,Canada 2018,46.025,-61.59,265,CFL,6/20/2019,31.24,29.07,,,,,,miniPAT,Wildlife,,,,,,,MED,,Block,TAG,,
+511900100,18P0886,173442,5/30/2019,Israel 2019,32.269,34.53,154,CFL,5/30/2020,32.242,34.267,5/31/2020,32.20699,34.22979,tag recovered,archdata,miniPAT,Wildlife,,,,,,,MED,2,Block,TAG,,
+511900200,18P0893,177328,6/3/2019,Israel 2019,32.152,34.409,141,CFL,9/11/2020,40.7597,1.1026,12/1/2021,35.935478,14.481393,tag recovered,archdata,miniPAT,Wildlife,,6/27/2020,,,,,MED,2,Block,TAG,6/27/2020,The file “5119002_18P083DC_merged.csv” includes the original data up until 5/8 and the adjusted data until 6/27.
+511900500,18P0875,173436,6/5/2019,Israel 2019,32.108,34.388,136,CFL,12/3/2019,31.7735,33.9218,,,,,,miniPAT,Wildlife,,,,,,,MED,,Block,TAG,,
+512208400,21P2010,233960,9/11/2022,Norway 2022,62.3,5,240,CFL,9/12/2023,62.6,5.3,,,,tag recovered,archdata,miniPAT,Wildlife,,,,,,,MED,0,ICCAT,Norway,,

@@ -3,7 +3,7 @@
 
 %% Go To Folder
 
-cd([fdir '/data/SSM']);
+cd('/TOPP/Tuna/ABFT/Recovery/SSM/version10/csv/');
 
 %% Get List of Files
 
@@ -11,65 +11,33 @@ files = dir('*SSM.txt');
 
 %% Load Files
 
+SSM=cell(length(files),1); % empty placeholder cell array to hold tables
+
 for i = 1:length(files)
 
     if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
         continue
     end
 
-    if exist('SSM','var') == 0
+    tmp = readtable(files(i).name);
+    tmp = tmp(:,1:3);
+    tmp.Properties.VariableNames = {'Date' 'Longitude' 'Latitude'};
 
-        SSM = readtable(files(i).name);
-        SSM = SSM(:,1:3);    
-        SSM.Properties.VariableNames = {'Date' 'Longitude' 'Latitude'};
+    TOPPID = str2double(files(i).name(1:7))*ones(size(tmp,1),1);
+    tmp = addvars(tmp,TOPPID,'Before','Date');
 
-        TOPPID = str2double(files(i).name(1:7))*ones(size(SSM,1),1);
-        SSM = addvars(SSM,TOPPID,'Before','Date');
+    tmp.Date = datetime(year(tmp.Date),month(tmp.Date),day(tmp.Date));
 
-        SSM.Date = datetime(year(SSM.Date),month(SSM.Date),day(SSM.Date));
-
-        date_rm = min([META.popdate(META.toppID == TOPPID(1)),...
-            META.recdate(META.toppID == TOPPID(1)), ...
-            META.date_last_depth(META.toppID == TOPPID(1)), ...
-            META.date_last_light(META.toppID == TOPPID(1)), ...
-            META.date_last_lon(META.toppID == TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == TOPPID(1))]);
-
-        SSM(SSM.Date >= date_rm,:) = [];
-
-        clear date_rm
-
-    else
-
-        tmp = readtable(files(i).name);
-        tmp = tmp(:,1:3);    
-        tmp.Properties.VariableNames = {'Date' 'Longitude' 'Latitude'};
-
-        TOPPID = str2double(files(i).name(1:7))*ones(size(tmp,1),1);
-        tmp = addvars(tmp,TOPPID,'Before','Date');
-
-        tmp.Date = datetime(year(tmp.Date),month(tmp.Date),day(tmp.Date));
-
-        date_rm = min([META.popdate(META.toppID == TOPPID(1)),...
-            META.recdate(META.toppID == TOPPID(1)), ...
-            META.date_last_depth(META.toppID == TOPPID(1)), ...
-            META.date_last_light(META.toppID == TOPPID(1)), ...
-            META.date_last_lon(META.toppID == TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == TOPPID(1))]);
-
-        tmp(tmp.Date >= date_rm,:) = [];
-
-        SSM = [SSM; tmp];
-
-        clear tmp
-        clear date_rm
-    end
-
-    clear TOPPID
-
+    date_variable_names = {
+        'popdate','recdate','date_last_depth','date_last_light','date_last_lon','manual_cut_date'
+        };
+    dates = table2array(META(META.toppID == TOPPID(1),date_variable_names));
+    date_rm = min(dates(:));
+    tmp(tmp.Date >= date_rm,:) = [];
+    SSM{i}=tmp;
 end
-clear i
-clear files
+SSM=cat(1,SSM{:});
+
 
 %% Define hotspots.
 
@@ -82,6 +50,24 @@ clear files
 % 6 = Aegean Sea
 % 7 = Levantine Sea
 
+
+% How the shape files for each sea were gathered
+%
+% For each Sea:
+%
+% Open 'https://marineregions.org/gazetteer.php?p=search' using
+% a web browser eg firefox. This opens the Gazetter Search Page.
+% Manually enter name of the Sea, eg 'Alboran Sea'.
+% Select the link which is annotated '(IHO Sea Area)'.
+% Set format to 'Shapefile'.
+% Press 'Download' button.
+% This will download a file called 'iho.zip' file to the Downloads dir.
+% From the command line type the command:  'unzip Downloads/iho.zip'.
+% This produces a series of files, but only 'iho.shp' is needed.
+% Rename 'iho.shp' to reflect the Sea name eg 'alboran.shp'
+
+% the file 
+
 % Alboran Sea
 cd([fdir '/data/shp/alboran'])
 tmp = shaperead('alboran.shp');
@@ -91,6 +77,7 @@ clear tmp
 % Western Med
 cd([fdir '/data/shp/westernmed'])
 tmp = shaperead('westernmed.shp');
+regions.Alboran = [tmp.X.', tmp.Y.'];
 ind = find(isnan(tmp.X));
 regions.WesternMed = [tmp.X(1:ind(1)).', tmp.Y(1:ind(1)).'];
 clear ind
@@ -129,6 +116,13 @@ ind = find(isnan(tmp.X));
 regions.Levantine = [tmp.X(1:ind(1)).', tmp.Y(1:ind(1)).'];
 clear tmp
 
+% Black Sea
+cd([fdir '/data/shp/black'])
+tmp = shaperead('black.shp');
+ind = find(isnan(tmp.X));
+regions.Black = [tmp.X(1:ind(1)).', tmp.Y(1:ind(1)).'];
+clear tmp
+
 SSM.Region = zeros(height(SSM.TOPPID),1);
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
@@ -137,6 +131,7 @@ SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Ionian(:,1),regions.Ioni
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Tunisian(:,1),regions.Tunisian(:,2))) = 5;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
+SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Black(:,1),regions.Black(:,2))) = 8;
 
 % Because of the differences in land area used to constrain SSM, there are
 % points in the Med that are classified to be outside. Use the following to
