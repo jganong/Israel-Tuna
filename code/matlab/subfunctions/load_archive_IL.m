@@ -20,6 +20,7 @@
 PSAT=cell(height(META),1); % empty placeholder cell array to hold tables
 for i = 1:height(META)
     row=META(i,:);
+    disp(['starting interation ' num2str(i)]);
     file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'DC.csv');
 
 
@@ -33,6 +34,7 @@ for i = 1:height(META)
     % SO WE HAVE TO DO THE REVERSE CHECK
 
     if exist(file,'file') == 0
+        disp([file{1} ' does not exist, continuing to next iteration of loop'])
         continue
     end
 
@@ -137,11 +139,15 @@ for i = 1:height(META)
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Black(:,1),regions.Black(:,2))) = 8;
     PSAT{i}=tmp;
     end
+disp([ 'got to end of iteration ' num2str(i)])
+
 end
 PSAT=cat(1,PSAT{:});
+disp('got to end of loop')
 
 PSAT.Date.TimeZone = 'UTC';
 
+disp('got to line 148')
 %% Fix assignment to region.
 % Because of the differences in land area used to constrain SSM, there are
 % points in the Med that are classified to be outside. Use the following to
@@ -150,10 +156,14 @@ PSAT.Date.TimeZone = 'UTC';
 ind0 = find(PSAT.Region == 0 & PSAT.Longitude >= -5.6061);
 indf = find(PSAT.Region ~= 0 & PSAT.Longitude >= -5.6061);
 
-for i = 1:length(ind0)
-    [~,ind] = min(abs(indf-ind0(i)));
-    PSAT.Region(ind0(i)) = PSAT.Region(indf(ind));
-end
+disp('got to line 159');
+
+rf = PSAT.Region(indf);
+
+r0 = interp1(indf, rf, ind0,'nearest');
+PSAT.Region(ind0) = r0;
+
+disp('got to line 166')
 clear i
 clear ind*
 
@@ -162,7 +172,9 @@ PSAT.Region(PSAT.Latitude > 46) = 0;
 
 %% Find sunrise and sunset time to determine if observation is day or night.
 
+disp('got to line 175')
 [SRISE,SSET] = sunrise(PSAT.Latitude,PSAT.Longitude,0,0,PSAT.DateTime);
+disp('got to line 177')
 PSAT.DayNight = zeros(height(PSAT),1);
 PSAT.DayNight(PSAT.DateTime > datetime(SRISE,'ConvertFrom','datenum','TimeZone','UTC') & PSAT.DateTime < datetime(SSET,'ConvertFrom','datenum','TimeZone','UTC')) = 1;
 

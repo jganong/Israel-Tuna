@@ -1,6 +1,7 @@
-addpath  ~/Israel-Tuna/code/matlab
-cd  ~/Israel-Tuna/code/matlab
-%% Israel Tuna %%
+addpath  ~/Israel-Tuna-jeg/code/matlab
+ cd  /home/jeg/Israel-Tuna-jeg/code/matlab
+    
+    %% Israel Tuna %%
 % The following runs code to process, analyze and plot data related to
 % tag deployments on tuna from Israel and beyond in the Med.
 %
@@ -25,7 +26,7 @@ if exist(workspace_file)
     load('workspace_04212025_FINAL.mat')
 else
     toppdir = '/TOPP';
-    fdir = '/home/jeg/Israel-Tuna';
+    fdir = '/home/jeg/Israel-Tuna-jeg';
 
     if not(exist([toppdir '/Tuna']))
         error(['to regen ', workspace_file, ' you need /TOPP to be mounted'])
@@ -52,13 +53,19 @@ else
     cdtdir = [ fdir '/lib/cdt/CDT-master/cdt'];
     addpath(cdtdir)
 
+    disp('about to load META');
     run load_meta_IL.m
+    disp('about to load SSM');
     run load_SSM_IL
+    disp('about to load archive');
     run load_archive_IL
+    disp('about to load tseries');
     run load_tseries_IL
     %% Set timezone of SSM.
 
     SSM.Date.TimeZone = 'UTC';
+    disp('about to save workspace');
+    save(workspace_file)
 
     %% Data Analysis
 
