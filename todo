@@ -1,4 +1,5 @@
-figure out how to push back to github
+
+clean out many disp() calls
 
 output a table for each row in META, how many PSAT hits, how many TSERIES hits, before and after trimming
 
@@ -8,3 +9,6 @@ add it Eyal's regions, names, colors, apply to all _load_ scripts. delete worksp
 
 revise logic for outside of med -- perhaps use polygon union?
 
+when done, make another pull request to Eyal
+
+*DONE* figure out how to push back to github
