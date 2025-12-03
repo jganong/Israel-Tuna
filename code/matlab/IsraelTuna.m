@@ -42,8 +42,10 @@ else
     % and unzipped the downlod there
     gswdir =     [fdir '/lib/gsw'];
     gswlibdir =     [fdir '/lib/gsw/library'];
+    sunrisedir = [fdir '/lib/sunrise-master'];
     addpath(gswdir)
     addpath(gswlibdir)
+    addpath(sunrisedir)
     % camille's calculate_MLD_IL script
     % uses a function called mld()
     % that is provided by Climate Data Toolbox
@@ -55,12 +57,16 @@ else
 
     disp('about to load META');
     run load_meta_IL.m
+    
     disp('about to load SSM');
     run load_SSM_IL
-    disp('about to load archive');
-    run load_archive_IL
+
     disp('about to load tseries');
     run load_tseries_IL
+
+    disp('about to load archive');
+    run load_archive_IL
+
     %% Set timezone of SSM.
 
     SSM.Date.TimeZone = 'UTC';

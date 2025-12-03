@@ -1,25 +1,39 @@
 %% load_tseries_IL
 % Sub-function of IsraelTuna.m; loads series data from transmitted tags.
 
-%% Go to folder.
+%
+% Go to folder.
 
-cd([fdir '/data/tseries']);
 
-%% Get list of files.
 
-files = dir('*Series.csv');
 
-%% Loop through files.
+%% Get list of files, but instead of using /data/dc, get from /TOPP
 
-for i = 1:length(files)
 
-    disp(i)
 
-    if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
+
+TSERIES=cell(height(META),1); % empty placeholder cell array to hold tables
+for i = 1:height(META)
+    row=META(i,:);
+    disp(['starting interation ' num2str(i)]);
+
+    file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
+
+    % file is dervied from META so no need to skip files not in META
+    % (there are none)
+    % if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
+    %     continue
+    % end
+    %
+    % BUT CONVERSELY, THERE ARE SOME ROWS IN META WITH NO DC FILE,
+    % SO WE HAVE TO DO THE REVERSE CHECK
+
+    if exist(file,'file') == 0
+        disp([file{1} ' does not exist, continuing to next iteration of loop'])
         continue
     end
 
-    if exist('TSERIES','var') == 0
+
 
         %% Set up the import options
         opts = delimitedTextImportOptions("NumVariables", 14);
@@ -45,159 +59,46 @@ for i = 1:length(files)
 
         %% Load data.
 
-        TSERIES = readtable(files(i).name,opts);
-
-        TSERIES.DateTime = datetime(year(TSERIES.Day),month(TSERIES.Day),day(TSERIES.Day),...
-            hour(TSERIES.Time),minute(TSERIES.Time),second(TSERIES.Time));
-        TSERIES(:,2:3) = [];
-        TSERIES = movevars(TSERIES, 'DateTime', 'Before', 'Depth');
-
-        TSERIES.TOPPID = str2double(files(i).name(1:7))*ones(size(TSERIES,1),1);
-        TSERIES = movevars(TSERIES, 'TOPPID', 'Before', 'DateTime');
-
-        %% Remove data before deployment date.
-
-        TSERIES(TSERIES.DateTime <= META.taggingdate(META.toppID == TSERIES.TOPPID(1)),:) = [];
-
-        %% Remove data after first date of "last" or manual.
-
-        date_rm = min([META.popdate(META.toppID == TSERIES.TOPPID(1)),...
-            META.recdate(META.toppID == TSERIES.TOPPID(1)), ...
-            META.date_last_depth(META.toppID == TSERIES.TOPPID(1)), ...
-            META.date_last_light(META.toppID == TSERIES.TOPPID(1)), ...
-            META.date_last_lon(META.toppID == TSERIES.TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == TSERIES.TOPPID(1))]);
-
-        TSERIES(TSERIES.DateTime >= date_rm,:) = [];
-
-        clear date_rm
-
-        %% Remove data after last SSM date.
-
-        TSERIES(TSERIES.DateTime > max(SSM.Date(SSM.TOPPID == TSERIES.TOPPID(1))),:) = [];
-
-        %% Time Zone Correction
-
-        if isnan(META.timezone_correction(META.toppID == TSERIES.TOPPID(1)))
-            tz = '+00:00';
-        elseif META.timezone_correction(META.toppID == TSERIES.TOPPID(1)) >= 0 
-            tz = ['+0' num2str(META.timezone_correction(META.toppID == TSERIES.TOPPID(1))) ':00'];
-        else
-            tz = ['-0' num2str(abs(META.timezone_correction(META.toppID == TSERIES.TOPPID(1)))) ':00'];
-        end
-        TSERIES.DateTime.TimeZone = tz;
-        clear tz
-
-        TSERIES.DateTime.TimeZone = 'UTC';
-
-        TSERIES.Date = datetime(year(TSERIES.DateTime),month(TSERIES.DateTime),day(TSERIES.DateTime));
-        TSERIES = movevars(TSERIES, 'Date', 'Before', 'Depth');
-
-        %% Interpolate SSM positions to match TSERIES data.
-
-        TSERIES.Longitude = interp1(datenum(SSM.Date(SSM.TOPPID == TSERIES.TOPPID(1))),...
-            SSM.Longitude(SSM.TOPPID == TSERIES.TOPPID(1)),datenum(TSERIES.DateTime));
-
-        TSERIES.Latitude = interp1(datenum(SSM.Date(SSM.TOPPID == TSERIES.TOPPID(1))),...
-            SSM.Latitude(SSM.TOPPID == TSERIES.TOPPID(1)),datenum(TSERIES.DateTime));
-
-        %% Remove values outside of the Med.
-
-        ind = TSERIES.Longitude <= -5.6061;
-        TSERIES(ind,:) = [];
-
-        ind = TSERIES.Latitude >= 46;
-        TSERIES(ind,:) = [];
-
-        %% Determine season.
-
-        % 1 = Fall which includes September, October and November.
-        % 2 = Winter which includes December, January and February.
-        % 3 = Spring which includes March, April and May.
-        % 4 = Summer which includes June, July and August.
-
-        TSERIES.Season = zeros(length(TSERIES.Latitude),1);
-        TSERIES.Season(month(TSERIES.DateTime) == 9 | month(TSERIES.DateTime) == 10 | month(TSERIES.DateTime) == 11) = 1;
-        TSERIES.Season(month(TSERIES.DateTime) == 12 | month(TSERIES.DateTime) == 1 | month(TSERIES.DateTime) == 2) = 2;
-        TSERIES.Season(month(TSERIES.DateTime) == 3 | month(TSERIES.DateTime) == 4 | month(TSERIES.DateTime) == 5) = 3;
-        TSERIES.Season(month(TSERIES.DateTime) == 6 | month(TSERIES.DateTime) == 7 | month(TSERIES.DateTime) == 8) = 4;
-
-        %% Determine hotspot.
-
-        TSERIES.Region = zeros(height(TSERIES.TOPPID),1);
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Adriatic(:,1),regions.Adriatic(:,2))) = 3;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Ionian(:,1),regions.Ionian(:,2))) = 4;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Tunisian(:,1),regions.Tunisian(:,2))) = 5;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
-        TSERIES.Region(inpolygon(TSERIES.Longitude,TSERIES.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
-
-    else
-
-        %% Set up the import options
-        opts = delimitedTextImportOptions("NumVariables", 14);
-
-        % Specify range and delimiter
-        opts.DataLines = [2, Inf];
-        opts.Delimiter = ",";
-
-        % Specify column names and types
-        opts.VariableNames = ["ptt", "Var2", "Var3", "Var4", "Var5", "Day", "Time", "Var8", "Var9", "Var10", "Depth", "DRange", "Temperature", "TRange"];
-        opts.SelectedVariableNames = ["ptt", "Day", "Time", "Depth", "DRange", "Temperature", "TRange"];
-        opts.VariableTypes = ["double", "char", "char", "char", "char", "datetime", "datetime", "char", "char", "char", "double", "double", "double", "double"];
-
-        % Specify file level properties
-        opts.ExtraColumnsRule = "ignore";
-        opts.EmptyLineRule = "read";
-
-        % Specify variable properties
-        opts = setvaropts(opts, ["Var2", "Var3", "Var4", "Var5", "Var8", "Var9", "Var10"], "WhitespaceRule", "preserve");
-        opts = setvaropts(opts, ["Var2", "Var3", "Var4", "Var5", "Var8", "Var9", "Var10"], "EmptyFieldRule", "auto");
-        opts = setvaropts(opts, "Day", "InputFormat", "dd-MMM-yyyy");
-        opts = setvaropts(opts, "Time", "InputFormat", "HH:mm:ss");
-
-        %% Load data.
-
-        tmp = readtable(files(i).name,opts);
+        tmp = readtable(file,opts);
 
         tmp.DateTime = datetime(year(tmp.Day),month(tmp.Day),day(tmp.Day),...
             hour(tmp.Time),minute(tmp.Time),second(tmp.Time));
         tmp(:,2:3) = [];
         tmp = movevars(tmp, 'DateTime', 'Before', 'Depth');
 
-        tmp.TOPPID = str2double(files(i).name(1:7))*ones(size(tmp,1),1);
+        tmp.TOPPID(:) = row.toppID;
         tmp = movevars(tmp, 'TOPPID', 'Before', 'DateTime');
 
         %% Remove data before deployment date.
 
-        tmp(tmp.DateTime <= META.taggingdate(META.toppID == tmp.TOPPID(1)),:) = [];
+        tmp(tmp.DateTime <= row.taggingdate,:) = [];
 
         %% Remove data after first date of "last" or manual.
 
-        date_rm = min([META.popdate(META.toppID == tmp.TOPPID(1)),...
-            META.recdate(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_depth(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_light(META.toppID == tmp.TOPPID(1)), ...
-            META.date_last_lon(META.toppID == tmp.TOPPID(1)), ...
-            META.manual_cut_date(META.toppID == tmp.TOPPID(1))]);
+        date_rm = min([row.popdate,...
+            row.recdate, ...
+            row.date_last_depth, ...
+            row.date_last_light, ...
+            row.date_last_lon, ...
+            row.manual_cut_date]);
 
         tmp(tmp.DateTime >= date_rm,:) = [];
 
-        clear date_rm
-
+if height(tmp)==0
+    continue;
+end
         %% Remove data after last SSM date.
 
-        tmp(tmp.DateTime > max(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),:) = [];
+        tmp(tmp.DateTime > max(SSM.Date(SSM.TOPPID == row.toppID)),:) = [];
 
         %% Time Zone Correction
 
-        if isnan(META.timezone_correction(META.toppID == tmp.TOPPID(1)))
+        if isnan(row.timezone_correction)
             tz = '+00:00';
-        elseif META.timezone_correction(META.toppID == tmp.TOPPID(1)) >= 0 
-            tz = ['+0' num2str(META.timezone_correction(META.toppID == tmp.TOPPID(1))) ':00'];
+        elseif row.timezone_correction >= 0 
+            tz = ['+0' num2str(row.timezone_correction)   ':00'];
         else
-            tz = ['-0' num2str(abs(META.timezone_correction(META.toppID == tmp.TOPPID(1)))) ':00'];
+            tz = ['-0' num2str(abs(row.timezone_correction)) ':00'];
         end
         tmp.DateTime.TimeZone = tz;
         clear tz
@@ -247,20 +148,12 @@ for i = 1:length(files)
         tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
         tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
 
-        %% Combine tables.
 
-        TSERIES = [TSERIES; tmp];
-
-        clear tmp
-    end
-
-    clear TOPPID
+        TSERIES{i} = tmp;
 
 end
-clear i
-clear opts
-
-clear files
+% combine separate tables into one table, dropping empty tables
+TSERIES = cat(1,TSERIES{:});
 
 TSERIES.Date.TimeZone = 'UTC';
 
@@ -268,16 +161,12 @@ TSERIES.Date.TimeZone = 'UTC';
 % Because of the differences in land area used to constrain SSM, there are
 % points in the Med that are classified to be outside. Use the following to
 % determine region.
-
+% This version uses nearest neighbor interpolation for speed
 ind0 = find(TSERIES.Region == 0 & TSERIES.Longitude >= -5.6061);
 indf = find(TSERIES.Region ~= 0 & TSERIES.Longitude >= -5.6061);
-
-for i = 1:length(ind0)
-    [~,ind] = min(abs(indf-ind0(i)));
-    TSERIES.Region(ind0(i)) = TSERIES.Region(indf(ind));
-end
-clear i
-clear ind*
+rf = TSERIES.Region(indf);
+r0 = interp1(indf, rf, ind0,'nearest');
+TSERIES.Region(ind0) = r0;
 
 TSERIES.Region(TSERIES.Longitude <= -5.6061) = 0;
 TSERIES.Region(TSERIES.Latitude > 46) = 0;
@@ -288,5 +177,3 @@ TSERIES.Region(TSERIES.Latitude > 46) = 0;
 TSERIES.DayNight = zeros(height(TSERIES),1);
 TSERIES.DayNight(TSERIES.DateTime > datetime(SRISE,'ConvertFrom','datenum','TimeZone','UTC') & TSERIES.DateTime < datetime(SSET,'ConvertFrom','datenum','TimeZone','UTC')) = 1;
 
-clear SRISE
-clear SSET

@@ -17,6 +17,10 @@ Source: lanternfish:/home/jeg/hr/both_wild_and_captive/FINAL_04212025/code/matla
 Source: http://www.TEOS-10.org
 Used by: calculate_MLD_IL.m
 
+Title: sunrise
+Source: https://github.com/beaudu/sunrise
+Used by: load_archive_IL.m
+Note: I am not sure, but it has a similar signature.  The outputs might need to change slightly. 
 # HOW TO RUN THE ANALYSIS
 
 cd /home/jeg/Israel-Tuna/code/matlab

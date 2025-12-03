@@ -1,26 +1,18 @@
 %% load_archive_IL
 % Sub-function of IsraelTuna.m; loads data from recovered tags.
 
-% %% Go to folder.
 %
-% %%% Currently, there are no DC files from the Turkey series.
-% %%% Create an empty DC dir unless it already exists (mkdir -p does this).
-% %%% This should be harmless even if DC files are there in the future.
-%
-% system(['mkdir -p ' fdir '/data/dc']);
-%
-% cd([fdir '/data/dc']);
-
-%% Get list of files, butg insteadd of using /data/dc, get from /TOPP
+% Go to folder.
 
 
+%% Get list of files, but instead of using /data/dc, get from /TOPP
 
-%% Loop through files.
 
 PSAT=cell(height(META),1); % empty placeholder cell array to hold tables
 for i = 1:height(META)
     row=META(i,:);
     disp(['starting interation ' num2str(i)]);
+
     file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'DC.csv');
 
 
@@ -142,6 +134,7 @@ for i = 1:height(META)
 disp([ 'got to end of iteration ' num2str(i)])
 
 end
+% combine separate tables into one table, dropping empty tables
 PSAT=cat(1,PSAT{:});
 disp('got to end of loop')
 
@@ -152,20 +145,11 @@ disp('got to line 148')
 % Because of the differences in land area used to constrain SSM, there are
 % points in the Med that are classified to be outside. Use the following to
 % determine region.
-
 ind0 = find(PSAT.Region == 0 & PSAT.Longitude >= -5.6061);
 indf = find(PSAT.Region ~= 0 & PSAT.Longitude >= -5.6061);
-
-disp('got to line 159');
-
 rf = PSAT.Region(indf);
-
 r0 = interp1(indf, rf, ind0,'nearest');
 PSAT.Region(ind0) = r0;
-
-disp('got to line 166')
-clear i
-clear ind*
 
 PSAT.Region(PSAT.Longitude <= -5.6061) = 0;
 PSAT.Region(PSAT.Latitude > 46) = 0;
@@ -178,5 +162,3 @@ disp('got to line 177')
 PSAT.DayNight = zeros(height(PSAT),1);
 PSAT.DayNight(PSAT.DateTime > datetime(SRISE,'ConvertFrom','datenum','TimeZone','UTC') & PSAT.DateTime < datetime(SSET,'ConvertFrom','datenum','TimeZone','UTC')) = 1;
 
-clear SRISE
-clear SSET
