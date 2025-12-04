@@ -11,7 +11,6 @@
 PSAT=cell(height(META),1); % empty placeholder cell array to hold tables
 for i = 1:height(META)
     row=META(i,:);
-    disp(['starting interation ' num2str(i)]);
 
     file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'DC.csv');
 
@@ -26,8 +25,9 @@ for i = 1:height(META)
     % SO WE HAVE TO DO THE REVERSE CHECK
 
     if exist(file,'file') == 0
-        disp([file{1} ' does not exist, continuing to next iteration of loop'])
-        continue
+	continue
+    else
+	CENSUS.PSAT_FILE(i)=file;
     end
 
 
@@ -35,6 +35,7 @@ for i = 1:height(META)
     %% Load data.
 
     tmp = readtable(file);
+    CENSUS.PSAT_RAW(i)=height(tmp);
 
 
 
@@ -87,6 +88,7 @@ for i = 1:height(META)
     tmp.Date = datetime(year(tmp.DateTime),month(tmp.DateTime),day(tmp.DateTime));
     tmp = movevars(tmp, 'Date', 'Before', 'Depth');
     if (height(tmp)==  0)
+        CENSUS.PSAT_TRIMMED(i)=height(tmp);
         continue % tmp is empty -- probably no SSM? -- skip this deployment
     end
     %% Interpolate SSM positions to match tmp data.
@@ -129,18 +131,16 @@ for i = 1:height(META)
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Black(:,1),regions.Black(:,2))) = 8;
+        CENSUS.PSAT_TRIMMED(i)=height(tmp);
     PSAT{i}=tmp;
     end
-disp([ 'got to end of iteration ' num2str(i)])
 
 end
 % combine separate tables into one table, dropping empty tables
 PSAT=cat(1,PSAT{:});
-disp('got to end of loop')
 
 PSAT.Date.TimeZone = 'UTC';
 
-disp('got to line 148')
 %% Fix assignment to region.
 % Because of the differences in land area used to constrain SSM, there are
 % points in the Med that are classified to be outside. Use the following to
@@ -156,9 +156,7 @@ PSAT.Region(PSAT.Latitude > 46) = 0;
 
 %% Find sunrise and sunset time to determine if observation is day or night.
 
-disp('got to line 175')
 [SRISE,SSET] = sunrise(PSAT.Latitude,PSAT.Longitude,0,0,PSAT.DateTime);
-disp('got to line 177')
 PSAT.DayNight = zeros(height(PSAT),1);
 PSAT.DayNight(PSAT.DateTime > datetime(SRISE,'ConvertFrom','datenum','TimeZone','UTC') & PSAT.DateTime < datetime(SSET,'ConvertFrom','datenum','TimeZone','UTC')) = 1;
 

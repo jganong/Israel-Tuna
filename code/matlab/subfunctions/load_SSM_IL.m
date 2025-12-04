@@ -3,38 +3,44 @@
 
 %% Go To Folder
 
-cd('/TOPP/Tuna/ABFT/Recovery/SSM/version10/csv/');
 
 %% Get List of Files
 
-files = dir('*SSM.txt');
-
 %% Load Files
 
-SSM=cell(length(files),1); % empty placeholder cell array to hold tables
+SSM=cell(height(META),1); % empty placeholder cell array to hold tables
 
-for i = 1:length(files)
+for i = 1:height(META)
+	row=META(i,:);
 
-    if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
+ % note that the Turkey tags are not double tagged, so the filename always ends in 00SSM.txt
+
+    file=[ '/TOPP/Tuna/ABFT/Recovery/SSM/version10/csv/' num2str(row.toppID) '00SSM.txt'];
+
+    if exist(file,'file') == 0
         continue
+    else
+	    CENSUS.SSM_FILE(i)=file;
     end
 
-    tmp = readtable(files(i).name);
+    tmp = readtable(file);
+        CENSUS.SSM_RAW(i)=height(tmp);
+
     tmp = tmp(:,1:3);
     tmp.Properties.VariableNames = {'Date' 'Longitude' 'Latitude'};
 
-    TOPPID = str2double(files(i).name(1:7))*ones(size(tmp,1),1);
-    tmp = addvars(tmp,TOPPID,'Before','Date');
+    tmp.TOPPID(:) = row.toppID;
 
     tmp.Date = datetime(year(tmp.Date),month(tmp.Date),day(tmp.Date));
 
     date_variable_names = {
         'popdate','recdate','date_last_depth','date_last_light','date_last_lon','manual_cut_date'
         };
-    dates = table2array(META(META.toppID == TOPPID(1),date_variable_names));
+    dates = table2array(row(:,date_variable_names));
     date_rm = min(dates(:));
     tmp(tmp.Date >= date_rm,:) = [];
     SSM{i}=tmp;
+        CENSUS.SSM_TRIMMED(i)=height(tmp);
 end
 SSM=cat(1,SSM{:});
 
@@ -123,7 +129,7 @@ ind = find(isnan(tmp.X));
 regions.Black = [tmp.X(1:ind(1)).', tmp.Y(1:ind(1)).'];
 clear tmp
 
-SSM.Region = zeros(height(SSM.TOPPID),1);
+SSM.Region(:) = 0;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
 SSM.Region(inpolygon(SSM.Longitude,SSM.Latitude,regions.Adriatic(:,1),regions.Adriatic(:,2))) = 3;

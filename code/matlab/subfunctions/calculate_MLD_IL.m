@@ -171,5 +171,5 @@ clear tmp
 
 oce = struct2table(oce);
 
-cd([fdir '/data/mld']);
-writetable(oce,'IsraelTuna_MLD.csv')
+mkdir([fdir '/data/mld']);
+writetable(oce, [fdir '/data/mld/IsraelTuna_MLD.csv'])

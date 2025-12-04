@@ -13,9 +13,9 @@
 
 
 TSERIES=cell(height(META),1); % empty placeholder cell array to hold tables
+
 for i = 1:height(META)
     row=META(i,:);
-    disp(['starting interation ' num2str(i)]);
 
     file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
 
@@ -29,8 +29,9 @@ for i = 1:height(META)
     % SO WE HAVE TO DO THE REVERSE CHECK
 
     if exist(file,'file') == 0
-        disp([file{1} ' does not exist, continuing to next iteration of loop'])
         continue
+    else
+	CENSUS.TSERIES_FILE(i) = file;
     end
 
 
@@ -60,6 +61,7 @@ for i = 1:height(META)
         %% Load data.
 
         tmp = readtable(file,opts);
+	CENSUS.TSERIES_RAW(i) = height(tmp);
 
         tmp.DateTime = datetime(year(tmp.Day),month(tmp.Day),day(tmp.Day),...
             hour(tmp.Time),minute(tmp.Time),second(tmp.Time));
@@ -85,8 +87,10 @@ for i = 1:height(META)
         tmp(tmp.DateTime >= date_rm,:) = [];
 
 if height(tmp)==0
-    continue;
+	CENSUS.TSERIES_TRIMMED(i) = height(tmp);
+	continue;
 end
+
         %% Remove data after last SSM date.
 
         tmp(tmp.DateTime > max(SSM.Date(SSM.TOPPID == row.toppID)),:) = [];
@@ -148,7 +152,7 @@ end
         tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
         tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
 
-
+	CENSUS.TSERIES_TRIMMED(i) = height(tmp);
         TSERIES{i} = tmp;
 
 end

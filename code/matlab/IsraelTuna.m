@@ -1,4 +1,7 @@
 addpath  ~/Israel-Tuna-jeg/code/matlab
+dbstop if error;
+%dbstop IsraelTuna.m  74
+
  cd  /home/jeg/Israel-Tuna-jeg/code/matlab
     
     %% Israel Tuna %%
@@ -55,22 +58,34 @@ else
     cdtdir = [ fdir '/lib/cdt/CDT-master/cdt'];
     addpath(cdtdir)
 
-    disp('about to load META');
     run load_meta_IL.m
+
+    CENSUS=META;
+    CENSUS.SSM_FILE(:)="";
+    CENSUS.SSM_RAW(:)=nan;
+    CENSUS.SSM_TRIMMED(:)=nan;
+    CENSUS.PSAT_RAW(:)=nan;
+    CENSUS.PSAT_TRIMMED(:)=nan;
+    CENSUS.PSAT_FILE(:)="";
+    CENSUS.TSERIES_RAW(:)=nan;
+    CENSUS.TSERIES_TRIMMED(:)=nan;
+    CENSUS.TSERIES_FILE(:)="";
+
+
+
     
-    disp('about to load SSM');
     run load_SSM_IL
 
-    disp('about to load tseries');
     run load_tseries_IL
 
-    disp('about to load archive');
     run load_archive_IL
 
     %% Set timezone of SSM.
 
     SSM.Date.TimeZone = 'UTC';
-    disp('about to save workspace');
+
+writetable(CENSUS,'census.csv')
+
     save(workspace_file)
 
     %% Data Analysis
