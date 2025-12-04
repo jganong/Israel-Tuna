@@ -3,6 +3,7 @@ dbstop if error;
 %dbstop IsraelTuna.m  74
 
  cd  /home/jeg/Israel-Tuna-jeg/code/matlab
+
     
     %% Israel Tuna %%
 % The following runs code to process, analyze and plot data related to
@@ -47,10 +48,14 @@ else
     gswlibdir =     [fdir '/lib/gsw/library'];
     sunrisedir = [fdir '/lib/sunrise-master'];
     m_mapdir = [fdir '/lib/m_map'];
-    addpath(gswdir)
-    addpath(gswlibdir)
-    addpath(sunrisedir)
-    addpath(m_mapdir)
+    addpath(gswdir);
+    addpath(gswlibdir);
+    addpath(sunrisedir);
+    addpath(m_mapdir);
+
+
+    make_subdirs;
+
     % camille's calculate_MLD_IL script
     % uses a function called mld()
     % that is provided by Climate Data Toolbox

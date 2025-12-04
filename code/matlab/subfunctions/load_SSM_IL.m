@@ -64,7 +64,7 @@ SSM=cat(1,SSM{:});
 % Open 'https://marineregions.org/gazetteer.php?p=search' using
 % a web browser eg firefox. This opens the Gazetter Search Page.
 % Manually enter name of the Sea, eg 'Alboran Sea'.
-% Select the link which is annotated '(IHO Sea Area)'.
+% Select the link which is annotated 'MEOW'.
 % Set format to 'Shapefile'.
 % Press 'Download' button.
 % This will download a file called 'iho.zip' file to the Downloads dir.

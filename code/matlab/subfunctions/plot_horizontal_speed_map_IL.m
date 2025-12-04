@@ -103,8 +103,8 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 
 %% Save
 
-mkdir([fdir '/figures']);
-exportgraphics(gcf,[fdir 'figures/speed_map_IL.png'],'Resolution',300)
+cd([fdir '/figures']);
+exportgraphics(gcf, 'figures/speed_map_IL.png','Resolution',300)
 
 %% Clear
 

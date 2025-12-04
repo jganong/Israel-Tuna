@@ -120,9 +120,8 @@ xlabel(h1,'Bottom Depth (m)','FontWeight','bold');
 set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 
 %% Save figure.
-w
-mkd  nir([fdir '/figures']);
-exportgraphics(gcf,[fdir '/figures/overview_map_IL.png'],'Resolution',300);
+cd([fdir '/figures']);
+exportgraphics(gcf, 'overview_map_IL.png','Resolution',300);
 
 %% Add Legend
 
@@ -131,7 +130,7 @@ delete(h1);
 t = m_plot(0,0,'ks','MarkerFaceColor','w','MarkerEdgeColor','k','MarkerSize',8,'LineStyle','none');
 p = m_plot(0,0,'kv','MarkerFaceColor','w','MarkerEdgeColor','k','MarkerSize',8,'LineStyle','none');
 
-[~,icon] = legend([m, t, p],[str2cell(string(yy));"Tagging";"Pop-Up"],'FontSize',14,'Location','eastoutside');
+[~,icon] = legend([m, t, p],[cellstr(string(yy));"Tagging";"Pop-Up"],'FontSize',14,'Location','eastoutside');
 icons = findobj(icon, 'type', 'line');
 set(icons,'MarkerSize',12);
 clear yy
@@ -140,8 +139,8 @@ clear t p
 
 %% Save figure with legend.
 
-mkdir([fdir '/figures']);
-exportgraphics(gcf,[fdir '/figures/overview_map_IL_legend.png'],'Resolution',300);
+cd([fdir '/figures']);
+exportgraphics(gcf, 'overview_map_IL_legend.png','Resolution',300);
 
 %% Clear
 

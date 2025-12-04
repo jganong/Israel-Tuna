@@ -1,7 +1,6 @@
+figure out histcounts2 issue
 
-change all the cd's to mkdir's.  make all output paths fullpaths
-
-figure out what this is:
+run the R code to generate the confidence interval spreadsheet for each tag, eg:
 plot_individual_tracks_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
 plot_individual_tracks_Med_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
 plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
@@ -22,3 +21,5 @@ when done, make another pull request to Eyal
 *DONE* output a table for each row in META, how many PSAT hits, how many TSERIES hits, before and after trimming
 
 *DONE* figure out why compute_MLD fails
+
+*DONE* change all the cd's to mkdir's.  make all output paths fullpaths
