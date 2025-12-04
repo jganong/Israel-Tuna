@@ -74,8 +74,8 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 
 %% Save
 
-cd([fdir '/figures']);
-exportgraphics(gcf,'time_in_mesopelagic_map_IL.png','Resolution',300)
+mkdir([fdir '/figures']);
+exportgraphics(gcf,[fdir 'figures/time_in_mesopelagic_map_IL.png'],'Resolution',300)
 
 %% Legend
 
@@ -89,7 +89,7 @@ set(icons,'LineWidth',4);
 clear MM
 clear icon*
 
-exportgraphics(gcf,'regions_legend_IL.png','Resolution',300)
+exportgraphics(gcf,[fdir 'figures/regions_legend_IL.png','Resolution'],300)
 
 %% Clear
 

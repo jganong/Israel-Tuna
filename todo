@@ -1,9 +1,10 @@
 
-clean out many disp() calls
+change all the cd's to mkdir's.  make all output paths fullpaths
 
-output a table for each row in META, how many PSAT hits, how many TSERIES hits, before and after trimming
-
-figure out why compute_MLD fails
+figure out what this is:
+plot_individual_tracks_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+plot_individual_tracks_Med_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
 
 add it Eyal's regions, names, colors, apply to all _load_ scripts. delete workspace and rerun
 
@@ -11,4 +12,13 @@ revise logic for outside of med -- perhaps use polygon union?
 
 when done, make another pull request to Eyal
 
+==================================================
+
 *DONE* figure out how to push back to github
+
+*DONE* clean out many disp() calls
+
+
+*DONE* output a table for each row in META, how many PSAT hits, how many TSERIES hits, before and after trimming
+
+*DONE* figure out why compute_MLD fails
