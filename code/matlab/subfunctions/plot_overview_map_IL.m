@@ -121,8 +121,8 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 
 %% Save figure.
 
-cd([fdir '/figures']);
-exportgraphics(gcf,'overview_map_IL.png','Resolution',300);
+mkfir([fdir '/figures']);
+exportgraphics(gcf,[fdir '/figures/overview_map_IL.png'],'Resolution',300);
 
 %% Add Legend
 
@@ -140,8 +140,8 @@ clear t p
 
 %% Save figure with legend.
 
-cd([fdir '/figures']);
-exportgraphics(gcf,'overview_map_IL_legend.png','Resolution',300);
+mkdir([fdir '/figures']);
+exportgraphics(gcf,[fdir '/figures/overview_map_IL_legend.png'],'Resolution',300);
 
 %% Clear
 
