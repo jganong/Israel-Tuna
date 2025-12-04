@@ -46,9 +46,11 @@ else
     gswdir =     [fdir '/lib/gsw'];
     gswlibdir =     [fdir '/lib/gsw/library'];
     sunrisedir = [fdir '/lib/sunrise-master'];
+    m_mapdir = [fdir '/lib/m_map'];
     addpath(gswdir)
     addpath(gswlibdir)
     addpath(sunrisedir)
+    addpath(m_mapdir)
     % camille's calculate_MLD_IL script
     % uses a function called mld()
     % that is provided by Climate Data Toolbox

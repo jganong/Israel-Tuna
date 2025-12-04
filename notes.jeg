@@ -21,7 +21,16 @@ Title: sunrise
 Source: https://github.com/beaudu/sunrise
 Used by: load_archive_IL.m
 Note: I am not sure, but it has a similar signature.  The outputs might need to change slightly. 
+
+
+Title: M_map
+Source:  https://www-old.eoas.ubc.ca/~rich/map.html
+Used by: load_archive_IL.m
+Note: Needed for its m_proj function 
+
+
 # HOW TO RUN THE ANALYSIS
+
 
 cd /home/jeg/Israel-Tuna/code/matlab
 matlab
