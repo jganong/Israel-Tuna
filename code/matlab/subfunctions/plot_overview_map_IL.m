@@ -121,7 +121,7 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 
 %% Save figure.
 
-mkfir([fdir '/figures']);
+mkd  ir([fdir '/figures']);
 exportgraphics(gcf,[fdir '/figures/overview_map_IL.png'],'Resolution',300);
 
 %% Add Legend
