@@ -22,12 +22,20 @@ Source: https://github.com/beaudu/sunrise
 Used by: load_archive_IL.m
 Note: I am not sure, but it has a similar signature.  The outputs might need to change slightly. 
 
-
 Title: M_map
 Source:  https://www-old.eoas.ubc.ca/~rich/map.html
 Used by: load_archive_IL.m
 Note: Needed for its m_proj function 
 
+Title: PyColormap4Matlab
+Source:  https://www.mathworks.com/matlabcentral/fileexchange/68239-pycolormap4matlab
+Used by: plot_daily_dive_frquency_map_IL.m
+Note: Needed for its getPlyPlot_cMap function 
+
+Title: matplotlib
+Note: needed by PyColormap4Matlab
+Command to install globally: sudo apt install python3-matplotlib
+Used by: plot_daily_dive_frquency_map_IL.m
 
 # HOW TO RUN THE ANALYSIS
 

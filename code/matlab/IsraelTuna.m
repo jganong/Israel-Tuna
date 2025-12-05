@@ -48,10 +48,12 @@ else
     gswlibdir =     [fdir '/lib/gsw/library'];
     sunrisedir = [fdir '/lib/sunrise-master'];
     m_mapdir = [fdir '/lib/m_map'];
+    colormapdir = [fdir '/lib/PyColormap4Matlab'];
     addpath(gswdir);
     addpath(gswlibdir);
     addpath(sunrisedir);
     addpath(m_mapdir);
+    addpath(colormapdir);
 
 
     make_subdirs;

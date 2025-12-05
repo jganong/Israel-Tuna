@@ -69,44 +69,6 @@ h = colorbar('FontSize',14,'Location','southoutside');
 % sudo apt install python-is-python3
 
 
-% Error using getPyPlot_cMap (line 122)
-% There was an error executing the command
-% 	python
-%     "/home/jeg/Israel-Tuna-jeg/lib/PyColormap4Matlab/pyplotCMap2txt.py"
-%     YlGnBu -o "/tmp/tp6c513512_bee0_4f4b_9ae1_3a216c201e57" -n 12
-% System returned:
-% 	Traceback (most recent call last):
-%   File
-%   "/home/jeg/Israel-Tuna-jeg/lib/PyColormap4Matlab/pyplotCMap2txt.py",
-%   line 5, in <module>
-%     import matplotlib.pyplot as plt
-%   File "/usr/lib/python3/dist-packages/matplotlib/__init__.py", line
-%   214, in <module>
-%     _check_versions()
-%   File "/usr/lib/python3/dist-packages/matplotlib/__init__.py", line
-%   208, in _check_versions
-%     module = importlib.import_module(modname)
-%              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-%   File "/usr/lib/python3.12/importlib/__init__.py", line 90, in
-%   import_module
-%     return _bootstrap._gcd_import(name[level:], package, level)
-%            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-%   File "/usr/lib/python3/dist-packages/kiwisolver/__init__.py", line
-%   8, in <module>
-%     from ._cext import (
-% ImportError: /usr/local/MATLAB/R2025b/sys/os/glnxa64/libstdc++.so.6:
-% version `GLIBCXX_3.4.32' not found (required by
-% /usr/lib/python3/dist-packages/kiwisolver/_cext.cpython-312-x86_64-linux-gnu.so)
-% 
-% 
-% Error in plot_daily_dive_frequency_map_IL (line 70)
-% colormap(getPyPlot_cMap('YlGnBu',12));
-%          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-% Caused by:
-%     There was an unexpected error while executing the python script.
-%     Sorry.
-
-
 % Force MATLAB to use system libstdc++
 if isunix && ~ismac
     system_lib = '/usr/lib/x86_64-linux-gnu';
@@ -115,7 +77,7 @@ if isunix && ~ismac
         setenv('LD_LIBRARY_PATH', [system_lib ':' current_path]);
         warning('Library path updated. You may need to restart MATLAB.');
     end
-end 
+end
 colormap(getPyPlot_cMap('YlGnBu',12)); 
 set(h,'Position',[0.65 0.615 0.2325 0.0244],'FontSize',12)
 ylabel(h,'Dive Frequency (no./day)','FontSize',16,'FontWeight','bold');

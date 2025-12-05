@@ -51,12 +51,8 @@ m_proj('miller','lon',LONLIMS,'lat',LATLIMS);
 
 %% Compute median of speed (m/s) in each bin.
 
-clear binned;
 binned.LONedges = -6:1:40;
 binned.LATedges = 30:1:46;
-
-LONmid = diff(binned.LONedges)/2 + binned.LONedges(1);
-LATmid = diff(binned.LATedges)/2 + binned.LATedges(1);
 
 % % Error using twodmed
 % % Too many output arguments.
@@ -68,14 +64,14 @@ LATmid = diff(binned.LATedges)/2 + binned.LATedges(1);
 % [binned.mz,binned.LONmid,binned.LATmid] = twodmed(B.speed.Longitude,B.speed.Latitude,...
 %         B.speed.Speed_m_per_s,binned.LONedges,binned.LATedges);
 
-[binned.mz] = twodmed(B.speed.Longitude,B.speed.Latitude,...
+[binned.mz, binned] = twodmed(B.speed.Longitude,B.speed.Latitude,...
          B.speed.Speed_m_per_s,binned.LONedges,binned.LATedges);
 
 
 
-% bins.speed = binned.mz.';
+bins.speed = binned.mz.';
 
-m_pcolor(LONmid-0.5,LATmid-0.5,binned.mz);
+m_pcolor(binned.LONmid-0.5,binned.LATmid-0.5,binned.mz);
 
 hold on
 
@@ -129,7 +125,7 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 %% Save
 
 cd([fdir '/figures']);
-exportgraphics(gcf, 'speed_map_IL.png','Resolution',300)
+exportgraphics(gcf, 'figures/speed_map_IL.png','Resolution',300)
 
 %% Clear
 
