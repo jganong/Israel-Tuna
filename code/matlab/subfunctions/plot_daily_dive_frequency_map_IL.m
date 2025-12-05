@@ -62,13 +62,16 @@ m_text(32, 39, ['n = ' num2str(length(unique(SSM.TOPPID(~isnan(SSM.DivesPerDay))
 
 %% Add colorbar
 
-h = colorbar('FontSize',14,'Location','southoutside'); 
-% install python3's matplotlib for this, see notes.jeg file
+h = colorbar('FontSize',14,'Location','southoutside');  
+
+% for getPyPlot_cMap,
+% install python3's matplotlib  see notes.jeg file
 % also make sure "python" runs python3.
 % i did it like this:
 % sudo apt install python-is-python3
-
-
+% 
+% this still gets the following error (and how to fix it)
+%
 % Error using getPyPlot_cMap (line 122)
 % There was an error executing the command
 % 	python
@@ -105,8 +108,8 @@ h = colorbar('FontSize',14,'Location','southoutside');
 % Caused by:
 %     There was an unexpected error while executing the python script.
 %     Sorry.
-
-
+%
+%
 % Force MATLAB to use system libstdc++
 if isunix && ~ismac
     system_lib = '/usr/lib/x86_64-linux-gnu';
@@ -116,7 +119,9 @@ if isunix && ~ismac
         warning('Library path updated. You may need to restart MATLAB.');
     end
 end 
-colormap(getPyPlot_cMap('YlGnBu',12)); 
+
+colormap(getPyPlot_cMap('YlGnBu',12));  
+
 set(h,'Position',[0.65 0.615 0.2325 0.0244],'FontSize',12)
 ylabel(h,'Dive Frequency (no./day)','FontSize',16,'FontWeight','bold');
 caxis([0 60]);
