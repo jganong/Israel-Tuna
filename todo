@@ -1,4 +1,6 @@
-figure out histcounts2 issue
+figure out plotting issue, median might be wrong, 
+
+finish getting all plots to run
 
 run the R code to generate the confidence interval spreadsheet for each tag, eg:
 plot_individual_tracks_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
@@ -23,3 +25,5 @@ when done, make another pull request to Eyal
 *DONE* figure out why compute_MLD fails
 
 *DONE* change all the cd's to mkdir's.  make all output paths fullpaths
+
+*DONE* figure out histcounts2 issue, was assigning 0 to out-of-bounds, bad for array indexing 

@@ -30,7 +30,7 @@ function [mz, counts] = twodmed(lon, lat, values, lonEdges, latEdges)
     
     % Compute median for each bin
     for i = 1:nLonBins
-        for j = 1%nLatBins
+        for j = 1:nLatBins
             mask = (indLon == i) & (indLat == j);
             if any(mask)
                 mz(i, j) = median(values(mask), 'omitnan');

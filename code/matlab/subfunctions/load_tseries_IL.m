@@ -20,18 +20,15 @@ for i = 1:height(META)
     file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
 
     % file is dervied from META so no need to skip files not in META
-    % (there are none)
-    % if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
-    %     continue
-    % end
+    % (there are none, because we are starting from META))
     %
     % BUT CONVERSELY, THERE ARE SOME ROWS IN META WITH NO DC FILE,
     % SO WE HAVE TO DO THE REVERSE CHECK
 
-    if exist(file,'file') == 0
-        continue
-    else
+    if exist(file,'file')
 	CENSUS.TSERIES_FILE(i) = file;
+    else
+        continue
     end
 
 
@@ -77,19 +74,24 @@ for i = 1:height(META)
 
         %% Remove data after first date of "last" or manual.
 
-        date_rm = min([row.popdate,...
-            row.recdate, ...
-            row.date_last_depth, ...
-            row.date_last_light, ...
-            row.date_last_lon, ...
-            row.manual_cut_date]);
+
+    date_variable_names = {
+        'popdate','recdate','date_last_depth','date_last_light','date_last_lon','manual_cut_date'
+        };
+    dates =  row(:,date_variable_names);
+    dates = table2cell(dates);
+
+    for j = 1:length(dates)
+	    if strcmp(class(dates{j}),'double') && isnan(dates{j})
+		    dates{j}=NaT;
+	    end
+    end
+
+
+    date_rm = min(cell2mat(dates));
 
         tmp(tmp.DateTime >= date_rm,:) = [];
 
-if height(tmp)==0
-	CENSUS.TSERIES_TRIMMED(i) = height(tmp);
-	continue;
-end
 
         %% Remove data after last SSM date.
 
@@ -113,12 +115,17 @@ end
         tmp = movevars(tmp, 'Date', 'Before', 'Depth');
 
         %% Interpolate SSM positions to match tmp data.
+	mask = SSM.TOPPID == row.toppID;
+	CENSUS.TSERIES_TRIMMED(i) = height(tmp); % in case we bail out 
+	if sum(mask) < 2
+		disp([ num2str(row.toppID) 'cannot interpolate with less than 2 SSM locations']);
+		continue;
+	end
+        tmp.Longitude = interp1(datenum(SSM.Date(mask)),...
+            SSM.Longitude(mask),datenum(tmp.DateTime));
 
-        tmp.Longitude = interp1(datenum(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),...
-            SSM.Longitude(SSM.TOPPID == tmp.TOPPID(1)),datenum(tmp.DateTime));
-
-        tmp.Latitude = interp1(datenum(SSM.Date(SSM.TOPPID == tmp.TOPPID(1))),...
-            SSM.Latitude(SSM.TOPPID == tmp.TOPPID(1)),datenum(tmp.DateTime));
+        tmp.Latitude = interp1(datenum(SSM.Date(mask)),...
+            SSM.Latitude(mask), datenum(tmp.DateTime));
 
         %% Remove values outside of the Med.
 
@@ -158,6 +165,11 @@ end
 end
 % combine separate tables into one table, dropping empty tables
 TSERIES = cat(1,TSERIES{:});
+
+if isempty(TSERIES)
+	disp('no TSERIES found') % warning() does not work here
+	return
+end
 
 TSERIES.Date.TimeZone = 'UTC';
 

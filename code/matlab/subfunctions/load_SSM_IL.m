@@ -36,8 +36,18 @@ for i = 1:height(META)
     date_variable_names = {
         'popdate','recdate','date_last_depth','date_last_light','date_last_lon','manual_cut_date'
         };
-    dates = table2array(row(:,date_variable_names));
-    date_rm = min(dates(:));
+    dates =  row(:,date_variable_names);
+    dates = table2cell(dates);
+
+    for j = 1:length(dates)
+	    if strcmp(class(dates{j}),'double') && isnan(dates{j})
+		    dates{j}=NaT;
+	    end
+    end
+
+
+    date_rm = min(cell2mat(dates));
+
     tmp(tmp.Date >= date_rm,:) = [];
     SSM{i}=tmp;
         CENSUS.SSM_TRIMMED(i)=height(tmp);

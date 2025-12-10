@@ -59,13 +59,22 @@ for i = 1:height(META)
 
     %% Remove data after first date of "last" or manual.
 
-    date_rm = min([row.popdate,...
-        row.recdate, ...
-        row.date_last_depth, ...
-        row.date_last_light, ...
-        row.date_last_lon, ...
-        row.manual_cut_date]);
 
+    date_variable_names = {
+        'popdate','recdate','date_last_depth','date_last_light','date_last_lon','manual_cut_date'
+        };
+    dates =  row(:,date_variable_names);
+    dates = table2cell(dates);
+
+    % sometimes they read in as NaN  (class numeric)
+    % other times as NaT (class datetime) 
+    % this makes them all class datetime
+    for j = 1:length(dates)
+	    if strcmp(class(dates{j}),'double') && isnan(dates{j})
+		    dates{j}=NaT;
+	    end
+    end
+    
     tmp(tmp.DateTime >= date_rm,:) = [];
 
     %% Remove data after last SSM date.
@@ -78,9 +87,10 @@ for i = 1:height(META)
     if row.timezone_correction > 0
         tz = ['+0' num2str(row.timezone_correction) ':00'];
     else if row.timezone_correction < 0
-            tz = ['-0' num2str(abs(row.timezone_correction)) ':00'];
-    else
-        tz = 'UTC'; % 0 or NaN
+		    tz = ['-0' num2str(abs(row.timezone_correction)) ':00'];
+	    else
+		    tz = 'UTC'; % 0 or NaN
+	    end
     end
 
     tmp.DateTime.TimeZone = tz;
@@ -131,13 +141,18 @@ for i = 1:height(META)
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Aegean(:,1),regions.Aegean(:,2))) = 6;
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Levantine(:,1),regions.Levantine(:,2))) = 7;
     tmp.Region(inpolygon(tmp.Longitude,tmp.Latitude,regions.Black(:,1),regions.Black(:,2))) = 8;
-        CENSUS.PSAT_TRIMMED(i)=height(tmp);
+    CENSUS.PSAT_TRIMMED(i)=height(tmp);
     PSAT{i}=tmp;
-    end
+    %end
 
 end
+
 % combine separate tables into one table, dropping empty tables
 PSAT=cat(1,PSAT{:});
+if isempty(PSAT)
+	disp('no PSAT data found') % warning() does not work here
+	return
+end
 
 PSAT.Date.TimeZone = 'UTC';
 

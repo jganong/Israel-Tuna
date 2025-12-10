@@ -1,0 +1,2 @@
+eventid,tagnumber,ptt,taggingdate,seriesname,deploylat,deploylon,length,length_type,popdate,poplat,poplon,recdate,reclat,reclon,recovered,archivaldata,tagmodel,manufacturer,sample_rate,date_last_depth,date_last_light,date_last_itemp,date_last_etemp,date_last_lon,stock,timezone_correction,tagowner,project
+512405600,24P0070,265523,6/8/2024,Turkey 2024,36.48,31.808,155,CFL,6/9/2025,36.6175,31.5131,6/12/2025,36.82228,30.67739,tag recovered,archdata,miniPAT,Wildlife,,,,,,,MED,3,ICCAT,ICCAT

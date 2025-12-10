@@ -44,7 +44,7 @@ for i = 1:length(toppID)
     end
     tmp = fillmissing(tmp,'previous');
     if length(tmp) ~= length(sub.DepthSmooth)
-        tmp = [tmp; tmp(end)*ones(1,length(sub.DepthSmooth)-length(tmp))];
+        tmp = [tmp; tmp(end)*ones(length(sub.DepthSmooth)-length(tmp),1)];
     end
     B.T{i} = tmp;
     clear j
