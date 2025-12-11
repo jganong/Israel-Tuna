@@ -1,4 +1,4 @@
-function [mz, counts] = twodmed(lon, lat, values, lonEdges, latEdges)
+function [binned] = twodmed(lon, lat, values, lonEdges, latEdges)
     % TWODMED Compute 2D binned median values and counts
     %
     % Inputs:
@@ -8,15 +8,21 @@ function [mz, counts] = twodmed(lon, lat, values, lonEdges, latEdges)
     %   latEdges   - latitude bin edges
     %
     % Outputs:
-    %   mz         - median values in each bin (nLon x nLat)
-    %   counts     - number of points in each bin
+    %   binned     - structure containing:
+    %       .mz      - median values in each bin (nLon x nLat)
+    %       .LONmid  - longitude bin midpoints
+    %       .LATmid  - latitude bin midpoints
 
     % Get bin dimensions
     nLonBins = length(lonEdges) - 1;
     nLatBins = length(latEdges) - 1;
     
+    % Calculate bin midpoints
+    binned.LONmid = (lonEdges(1:end-1) + lonEdges(2:end)) / 2;
+    binned.LATmid = (latEdges(1:end-1) + latEdges(2:end)) / 2;
+    
     % Initialize output
-    mz = NaN(nLonBins, nLatBins);
+    binned.mz = NaN(nLonBins, nLatBins);
     counts = zeros(nLonBins, nLatBins);
     
     % Bin the data
@@ -33,8 +39,9 @@ function [mz, counts] = twodmed(lon, lat, values, lonEdges, latEdges)
         for j = 1:nLatBins
             mask = (indLon == i) & (indLat == j);
             if any(mask)
-                mz(i, j) = median(values(mask), 'omitnan');
+                binned.mz(i, j) = median(values(mask), 'omitnan');
             end
         end
     end
 end
+

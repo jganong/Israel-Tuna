@@ -2,43 +2,34 @@
 % Sub-function of IsraelTuna.m; plots median horizontal speeed in 
 % 1 x 1 degree bins.
 
-%% Create list of unique toppIDs.
 
-toppID = unique(SSM.TOPPID);
 
 %% Compute distance between adjacent daily positions. 
-for i = 1:length(toppID)
-    clear tmp;
-    tmp.lat = SSM.Latitude(SSM.TOPPID == toppID(i));
-    tmp.lon = SSM.Longitude(SSM.TOPPID == toppID(i));
-    tmp.date = SSM.Date(SSM.TOPPID == toppID(i));
+tbl = cell(height(META),1);
+for i = 1:height(META)
+	row=META(i,:);
+	SSM_SUBSET = SSM(SSM.TOPPID == row.toppID, :);
 
-    tbl = table(toppID(i)*ones(sum(SSM.TOPPID == toppID(i))-1,1),'VariableNames',{'TOPPID'});
-    tbl.Distance_km = m_lldist(tmp.lon,tmp.lat);
-    tbl.Speed_m_per_s = tbl.Distance_km*1000./86400; % 1 day = 86400 seconds
-    tbl.Latitude = tmp.lat(1:end-1);
-    tbl.Longitude = tmp.lon(1:end-1);
-    tbl.Date = tmp.date(1:end-1);
+    tmp.lat = SSM_SUBSET.Latitude;
+    tmp.lon = SSM_SUBSET.Longitude;
+    tmp.date = SSM_SUBSET.Date;
+
+    Distance_km = m_lldist(tmp.lon,tmp.lat);
+    Speed_m_per_s = Distance_km*1000./86400; % 1 day = 86400 seconds
+    Latitude = tmp.lat(1:end-1);
+    Longitude = tmp.lon(1:end-1);
+    Date = tmp.date(1:end-1);
+    toppID 	= Latitude % placeholder copy
+    toppID(:)= row.toppID; % fill in the placeholder values with toppID
+    tbl{i} = table(toppID,Distance_km,Speed_m_per_s,Latitude,Longitude,Date);
+
     
 % I got the following error:
 % Unable to concatenate a datetime array that has a time zone with one
 % that does not have a time zone.
-
-% Set both to UTC
-B.speed.Date.TimeZone = 'UTC';
-tbl.Date.TimeZone = 'UTC';
-
-    if isfield(B,'speed')
-        B.speed = [B.speed; tbl];
-    else
-        B.speed = tbl;
-    end
-
-    clear tbl
-    clear tmp
-
+    tbl{i}.Date.TimeZone = 'UTC';
 end
-clear i
+B.speed = cat(1,tbl{:});
 
 %% Create figure and axes for bathymetry. 
 
@@ -111,7 +102,7 @@ m_northarrow(-3.9,43.6,2,'type',2,'linewi',2);
 m_ruler([.04 .24],.125,2,'fontsize',16,'ticklength',0.01);
 
 patch([0.25 0.33 0.33 0.25],[0.7 0.7 0.733 0.733],'w');
-m_text(32, 39, ['n = ' num2str(length(unique(B.speed.TOPPID)))], 'FontSize', 20);
+m_text(32, 39, ['n = ' num2str(length(unique(B.speed.toppID)))], 'FontSize', 20);
 
 %% Add colorbar
 

@@ -20,30 +20,12 @@ warning off
 
 
 %% Load Data
-
-workspace_file = 'workspace_04212025_FINAL.mat';
-
-% camille already ran this and saved the dataset,
-% so we can just load it, and skip running the load_* functions
-
-if exist(workspace_file)
-    load('workspace_04212025_FINAL.mat')
-else
-    toppdir = '/TOPP';
-    fdir = '/home/jeg/Israel-Tuna-jeg';
-
-    if not(exist([toppdir '/Tuna']))
-        error(['to regen ', workspace_file, ' you need /TOPP to be mounted'])
-    end
-
+fdir = '/home/jeg/Israel-Tuna-jeg';
+workspace_file = [ fdir '/workspace_WIP.mat'];
     % the above workspace file defines a value in fdir
     % that only makes sense on camille's computer,
     % so we redefine it to make sense in this git repo.
     addpath([ fdir '/code/matlab/subfunctions' ]);
-    % camille uses a function called 'gsw_t_interp'
-    % so i downloaded https://www.teos-10.org/software/gsw_matlab_v3_06_16.zip
-    % i made a folder in fdir/matlab called gsw
-    % and unzipped the downlod there
     gswdir =     [fdir '/lib/gsw'];
     gswlibdir =     [fdir '/lib/gsw/library'];
     sunrisedir = [fdir '/lib/sunrise-master'];
@@ -54,18 +36,21 @@ else
     addpath(sunrisedir);
     addpath(m_mapdir);
     addpath(colormapdir);
-
-
     make_subdirs;
-
-    % camille's calculate_MLD_IL script
-    % uses a function called mld()
-    % that is provided by Climate Data Toolbox
-    % so i downloaded it from:https://github.com/chadagreene/CDT
-    % then i made a directory in fdir/code called cdt
-    % and upzipped it there
     cdtdir = [ fdir '/lib/cdt/CDT-master/cdt'];
     addpath(cdtdir)
+
+% camille already ran this and saved the dataset,
+% so we can just load it, and skip running the load_* functions
+
+if exist(workspace_file)
+    load(workspace_file)
+else
+    toppdir = '/TOPP';
+
+    if not(exist([toppdir '/Tuna']))
+        error(['to regen ', workspace_file, ' you need /TOPP to be mounted'])
+    end
 
     run load_meta_IL.m
 
@@ -93,10 +78,11 @@ else
 
     SSM.Date.TimeZone = 'UTC';
 
-writetable(CENSUS,'census.csv')
+writetable(CENSUS,[ fdir '/census.csv'])
 
     save(workspace_file)
 
+end
     %% Data Analysis
 
 
@@ -163,6 +149,4 @@ writetable(CENSUS,'census.csv')
     run calculate_time_in_Med_regions_IL
     run calculate_dive_stats_IL
 
-    save(workspace_file)
 
-end
