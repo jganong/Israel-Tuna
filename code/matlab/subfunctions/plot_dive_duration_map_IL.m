@@ -16,8 +16,7 @@ m_proj('miller','lon',LONLIMS,'lat',LATLIMS);
 binned.LONedges = -6:1:40;
 binned.LATedges = 30:1:46;
 
-[binned.mz,binned.LONmid,binned.LATmid] = twodmed(B.dives.lon,B.dives.lat,...
-        B.dives.duration,binned.LONedges,binned.LATedges);
+[binned] = twodmed(B.dives.lon,B.dives.lat,B.dives.duration,binned.LONedges,binned.LATedges);
 bins.duration = binned.mz.';
 
 m_pcolor(binned.LONmid-0.5,binned.LATmid-0.5,binned.mz);

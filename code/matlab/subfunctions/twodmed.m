@@ -16,10 +16,12 @@ function [binned] = twodmed(lon, lat, values, lonEdges, latEdges)
     % Get bin dimensions
     nLonBins = length(lonEdges) - 1;
     nLatBins = length(latEdges) - 1;
-    
+    LONmid = (lonEdges(1:end-1)+lonEdges(2:end))/2;
+    LATmid = (latEdges(1:end-1)+latEdges(2:end))/2;
+
     % Calculate bin midpoints
-    binned.LONmid = (lonEdges(1:end-1) + lonEdges(2:end)) / 2;
-    binned.LATmid = (latEdges(1:end-1) + latEdges(2:end)) / 2;
+    binned.LONmid = repmat(LONmid', [1 nLatBins]);
+    binned.LATmid = repmat(LATmid, [nLonBins 1]);
     
     % Initialize output
     binned.mz = NaN(nLonBins, nLatBins);

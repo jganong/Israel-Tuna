@@ -49,18 +49,9 @@ binned.LATedges = 30:1:46;
 LONmid = diff(binned.LONedges)/2 + binned.LONedges(1);
 LATmid = diff(binned.LATedges)/2 + binned.LATedges(1);
 
-% % Error using twodmed
-% % Too many output arguments.
-% % 
-% % Error in plot_horizontal_speed_map_IL (line 57)
-% % [binned.mz,binned.LONmid,binned.LATmid] = twodmed(B.speed.Longitude,B.speed.Latitude,...
-%                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-% 
-% [binned.mz,binned.LONmid,binned.LATmid] = twodmed(B.speed.Longitude,B.speed.Latitude,...
-%         B.speed.Speed_m_per_s,binned.LONedges,binned.LATedges);
-
-[binned.mz] = twodmed(B.speed.Longitude,B.speed.Latitude,...
+[binned] = twodmed(B.speed.Longitude,B.speed.Latitude,...
          B.speed.Speed_m_per_s,binned.LONedges,binned.LATedges);
+
 
 
 

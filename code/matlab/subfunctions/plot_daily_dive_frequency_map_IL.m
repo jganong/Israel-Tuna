@@ -18,7 +18,7 @@ binned.LATedges = 30:1:46;
 LONmid = diff(binned.LONedges)/2 + binned.LONedges(1);
 LATmid = diff(binned.LATedges)/2 + binned.LATedges(1);
 
-[binned.mz] = twodmed(SSM.Longitude,SSM.Latitude,...
+[binned] = twodmed(SSM.Longitude,SSM.Latitude,...
         SSM.DivesPerDay,binned.LONedges,binned.LATedges);
 bins.daily_dive_f = binned.mz.';
 

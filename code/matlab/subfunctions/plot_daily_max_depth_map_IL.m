@@ -16,7 +16,7 @@ m_proj('miller','lon',LONLIMS,'lat',LATLIMS);
 binned.LONedges = -6:1:40;
 binned.LATedges = 30:1:46;
 
-[binned.mz,binned.LONmid,binned.LATmid] = twodmed(SSM.Longitude,SSM.Latitude,...
+[binned] = twodmed(SSM.Longitude,SSM.Latitude,...
         SSM.max_Depth,binned.LONedges,binned.LATedges);
 bins.daily_max_d = binned.mz.';
 
@@ -75,7 +75,7 @@ set(gca,'Position',[0.1300 0.1100 0.7750 0.8150]);
 %% Save
 
 cd([fdir '/figures']);
-exportgraphics(gcf, '/figures/daily_max_depth_map_IL.png','Resolution',300)
+exportgraphics(gcf, 'daily_max_depth_map_IL.png','Resolution',300)
 
 %% Clear
 

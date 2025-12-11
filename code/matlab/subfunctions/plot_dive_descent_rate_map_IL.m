@@ -16,7 +16,7 @@ m_proj('miller','lon',LONLIMS,'lat',LATLIMS);
 binned.LONedges = -6:1:40;
 binned.LATedges = 30:1:46;
 
-[binned.mz,binned.LONmid,binned.LATmid] = twodmed(B.dives.lon,B.dives.lat,...
+[binned] = twodmed(B.dives.lon,B.dives.lat,...
         B.dives.max_descent,binned.LONedges,binned.LATedges);
 bins.descent_rate = binned.mz.';
 

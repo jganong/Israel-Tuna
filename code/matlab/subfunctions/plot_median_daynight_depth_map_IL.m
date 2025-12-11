@@ -18,7 +18,7 @@ for i = 0:1
     binned.LONedges = -6:1:40;
     binned.LATedges = 30:1:46;
 
-    [binned.mz,binned.LONmid,binned.LATmid] = twodmed(PSAT.Longitude(PSAT.DayNight == i),PSAT.Latitude(PSAT.DayNight == i),...
+    [binned] = twodmed(PSAT.Longitude(PSAT.DayNight == i),PSAT.Latitude(PSAT.DayNight == i),...
         PSAT.Depth(PSAT.DayNight == i),binned.LONedges,binned.LATedges);
     if i == 1
         bins.median_depth_day = binned.mz.';
