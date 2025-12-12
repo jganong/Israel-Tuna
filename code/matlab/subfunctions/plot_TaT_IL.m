@@ -55,9 +55,13 @@ for i = 1:length(fieldnames(regions))+1
                 hold on
 
                 er = errorbar(binned.median.*-1,1.5:1:15.5,binned.mad,[],'horizontal');
-                er.Color = [0 0 0];
-                er.LineStyle = 'none';
-                er.LineWidth = 1;
+		% Assigning to 12 elements using a simple assignment statement is not supported. Consider using
+                % comma-separated list assignment.
+		for l = 1:length(er)
+			er(l).Color = [0 0 0];
+			er(l).LineStyle = 'none';
+			er(l).LineWidth = 1;
+		end
 
             elseif k == 2
                 b = barh(binned.median,'histc');
@@ -68,9 +72,11 @@ for i = 1:length(fieldnames(regions))+1
                 hold on
 
                 er = errorbar(binned.median,1.5:1:15.5,[],binned.mad,'horizontal');
-                er.Color = [0 0 0];
-                er.LineStyle = 'none';
-                er.LineWidth = 1;
+		for l = 1:length(er)
+			er(l).Color = [0 0 0];
+			er(l).LineStyle = 'none';
+			er(l).LineWidth = 1;
+		end
 
                 set(gca,'FontSize',14,'linewidth',2,'tickdir','out');
                 xlabel('Median % Time at Temperature','FontSize',16); ylabel('Temperature (^oC)','FontSize',16);
@@ -107,6 +113,9 @@ for i = 1:length(fieldnames(regions))+1
             rg = 'Aegean';
         elseif i == 8 
             rg = 'Levantine';
+	else
+		% Unrecognized function or variable 'rg'.
+		rg = 'Unknown';
         end
 
         if j == 1
@@ -117,6 +126,8 @@ for i = 1:length(fieldnames(regions))+1
             se = 'Spring';
         elseif j == 4
             se = 'Summer';
+	else
+		se = 'Unknown';
         end
 
         cd([fdir '/figures/Figure_S6']);

@@ -6,6 +6,7 @@
 
 %% Compute distance between adjacent daily positions. 
 tbl = cell(height(META),1);
+tmp = struct;
 for i = 1:height(META)
 	row=META(i,:);
 	SSM_SUBSET = SSM(SSM.TOPPID == row.toppID, :);
