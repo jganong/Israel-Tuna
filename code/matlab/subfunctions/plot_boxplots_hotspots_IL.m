@@ -4,7 +4,7 @@
 
 %% Speed (m/s)
 
-B.speed.Region = zeros(height(B.speed.TOPPID),1);
+B.speed.Region = zeros(height(B.speed.toppID),1);
 B.speed.Region(inpolygon(B.speed.Longitude,B.speed.Latitude,regions.Alboran(:,1),regions.Alboran(:,2))) = 1;
 B.speed.Region(inpolygon(B.speed.Longitude,B.speed.Latitude,regions.WesternMed(:,1),regions.WesternMed(:,2))) = 2;
 B.speed.Region(inpolygon(B.speed.Longitude,B.speed.Latitude,regions.Ionian(:,1),regions.Ionian(:,2))) = 4;
