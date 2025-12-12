@@ -1,3 +1,16 @@
+# TO RUN THIS
+# You need the libraries listed below.
+# If you run "devbox shell" on pompano, it will automatically install them for you.
+# Then run:
+#
+# source('IsrealTuna_99CI.R')   
+# sic, i know Israel is spelled with 'a' before 'e', it was that way when i got here!
+#
+# note, file f512404800.RData gets an error, so put it into the folder named junk/ to skip
+#
+# move the files that have been successfully processed to done/
+# this will save you from needlessly re-running them
+
 #----Load Libraries----
 
 library(runjags)
@@ -7,11 +20,21 @@ library(writexl)
 
 #----Set Working Directory----
 
-setwd("/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/")
+fdir = "/home/jeg/Israel-Tuna-jeg"
+
+
+setwd(fdir)
 
 #----Get List of File Names----
 
-files <- list.files("./data/ssm/raw_output/",pattern = "\\.RData$")
+
+# data/ssm is a link to mola, so we cannot easily put raw_output into data/ssm.
+# instead, we make a normal dir, called data/raw_output,
+# which contains copies of select files from mrcastle@sherlock:bathy/output
+
+files <- list.files("data/raw_output/",pattern = "\\.RData$")
+
+browser()
 
 #----Loop Through Files----
 
@@ -20,7 +43,7 @@ for (i in 1:length(files)) {
   
   print(i)
   
-  load(capture.output(cat("./data/ssm/raw_output/",files[i],sep = "")))
+  load(capture.output(cat("data/raw_output/",files[i],sep = "")))
   
   # Extract Posterior Distribution
   xxx <- as.mcmc.list(fit$mcmc,vars='x') # Markov Chain Monte Carlo (MCMC) output
@@ -58,7 +81,7 @@ for (i in 1:length(files)) {
   rm(kud)
   rm(tmp)
   
-  write_xlsx(CI, path = capture.output(cat("./data/ssm/raw_output/",as.character(fit$summary$id[1]),"_99CI_full.xlsx",sep = "")), col_names = FALSE)
+  write_xlsx(CI, path = capture.output(cat("./data/raw_output/",as.character(fit$summary$id[1]),"_99CI_full.xlsx",sep = "")), col_names = FALSE)
   
   rm(CI)
   

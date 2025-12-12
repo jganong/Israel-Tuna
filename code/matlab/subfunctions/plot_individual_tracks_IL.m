@@ -33,7 +33,7 @@ for t = 1:length(toppID)
 
     %% Load confidence intervals.
 
-    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+    cd([ fdir '/data/raw_output'])
 
     tmp = readmatrix([num2str(toppID(t)) '00_99CI_full.xlsx']);
 

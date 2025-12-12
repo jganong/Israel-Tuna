@@ -115,7 +115,7 @@ for i = 1:length(unique(SSM.Season))
             end
         
         end
-    end
+
 
         clear j
 
@@ -149,7 +149,7 @@ for i = 1:length(unique(SSM.Season))
 
         if i == 4
 
-            [~,icon] = legend(m(i),'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec',...
+            [~,icon] = legend(m,{'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'},...
                 'FontSize',14,'Location','eastoutside');
             icons = findobj(icon, 'type', 'line');
             set(icons,'MarkerSize',12);
