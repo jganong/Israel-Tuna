@@ -80,7 +80,8 @@ m_patch([-5.61 5 -5.61 -5.61],[40 46 46 40],'w');
 
 %% Plot hotspots
 
-cmap.regions = hsv(8);
+%%% need to increase this when you add regions
+cmap.regions = hsv(9);
 cmap.regions(3,:) = [1 1 0];
 cmap.regions(5:7,:) = cmap.regions(6:8,:);
 cmap.regions = [1 1 1; cmap.regions];
