@@ -1,11 +1,14 @@
-figure out plotting issue, median might be wrong, 
+deal with slow pushing by:
+     creating a new repo
+     import from Camille version
+     smart indent everthing
+     import from jeg version (without history)
+     extract all the error messages from the jeg history and paste into code
+     smart indent everything
+     commit
+     This should result in a version with a simple one step history and a simple diff indented Camille
 
 finish getting all plots to run
-
-run the R code to generate the confidence interval spreadsheet for each tag, eg:
-plot_individual_tracks_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
-plot_individual_tracks_Med_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
-plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
 
 add it Eyal's regions, names, colors, apply to all _load_ scripts. delete workspace and rerun
 
@@ -27,3 +30,12 @@ when done, make another pull request to Eyal
 *DONE* change all the cd's to mkdir's.  make all output paths fullpaths
 
 *DONE* figure out histcounts2 issue, was assigning 0 to out-of-bounds, bad for array indexing 
+
+*DONE* figure out plotting issue, median might be wrong, 
+
+*DONE* run the R code to generate the confidence interval spreadsheet for each tag, eg:
+plot_individual_tracks_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+plot_individual_tracks_Med_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/CloudStorage/GoogleDrive-cpagniel@stanford.edu/Shared drives/ABFT Med Eyal/data/ssm/raw_output')
+
+*done* deal with large file problem by deleting somehow data files erroneously added 
