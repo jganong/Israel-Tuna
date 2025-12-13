@@ -11,115 +11,62 @@
 % 5 = Tunisian Plateau/Gulf of Sidra
 % 6 = Aegean Sea
 % 7 = Levantine Sea
+% 8 = Black Sea
 
 %% Number of Days in Each Hotspot
 
-stats.daysperhotspot.Counts = groupcounts(SSM,{'TOPPID','Region'},'IncludeEmptyGroups',true);
+region_names= fieldnames(regions);
 
-% Alboran Sea
+for region_index = 1 : length(region_names)
 
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 1);
-stats.daysperhotspot.Alboran.nodays.mean = mean(t);
-stats.daysperhotspot.Alboran.nodays.std = std(t);
-stats.daysperhotspot.Alboran.nodays.min = min(t);
-stats.daysperhotspot.Alboran.nodays.max = max(t);
+	region = region_names{region_index}
 
-% % of total deployment
-d = groupcounts(SSM,'TOPPID');
-stats.daysperhotspot.Alboran.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.Alboran.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.Alboran.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.Alboran.prctdays.max = max((t./d.GroupCount)*100);
+	% note that even with IncludeEmptyGroups = true,
+	% if there is no data in a region there will be no entry!
+	stats.daysperhotspot.Counts = groupcounts(SSM,{'TOPPID','Region'},'IncludeEmptyGroups',true);
+	d = groupcounts(SSM,'TOPPID');
+	t = [];
+	for toppid_index = 1 : height(d)
+		toppid = d.TOPPID(toppid_index);
+		toppid_mask = (stats.daysperhotspot.Counts.TOPPID == toppid);
 
-clear t
+		% # of days
+		region_mask = (stats.daysperhotspot.Counts.Region == region_index);
 
-% Western Ionian
+		toppid_and_region_mask = toppid_mask & region_mask;
 
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 2);
-stats.daysperhotspot.WesternMed.nodays.mean = mean(t);
-stats.daysperhotspot.WesternMed.nodays.std = std(t);
-stats.daysperhotspot.WesternMed.nodays.min = min(t);
-stats.daysperhotspot.WesternMed.nodays.max = max(t);
 
-% % of total deployment
-stats.daysperhotspot.WesternMed.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.WesternMed.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.WesternMed.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.WesternMed.prctdays.max = max((t./d.GroupCount)*100);
+		count= sum(toppid_and_region_mask);
 
-clear t
+		disp(count);
 
-% Ionian Sea
+		if count 
+			% there is some data in this region for this toppid
+			t(toppid_index) = stats.daysperhotspot.Counts.GroupCount(toppid_and_region_mask);
+		else
+			% if there is no data for this fish in this region make it 0 rather than empty
+			t(toppid_index) = 0;
+		end
+	end
+	stats.daysperhotspot.(region).nodays.mean = mean(t);
+	stats.daysperhotspot.(region).nodays.std = std(t);
+	stats.daysperhotspot.(region).nodays.min = min(t);
+	stats.daysperhotspot.(region).nodays.max = max(t);
 
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 4);
-stats.daysperhotspot.Ionian.nodays.mean = mean(t);
-stats.daysperhotspot.Ionian.nodays.std = std(t);
-stats.daysperhotspot.Ionian.nodays.min = min(t);
-stats.daysperhotspot.Ionian.nodays.max = max(t);
 
-% % of total deployment
-stats.daysperhotspot.Ionian.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.Ionian.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.Ionian.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.Ionian.prctdays.max = max((t./d.GroupCount)*100);
+	% % of total deployment
+	% Error using ./
+	% Arrays have incompatible sizes for this operation.
+	% the problem appears to be the t has entries for each fish in each region,
+	% but we want to compare it to d, which only has entries for each fish.
+	% i think what we need is a loop, and do one fish at a time
 
-clear t
+	stats.daysperhotspot.(region).prctdays.mean = mean((t ./ d.GroupCount)*100);
+	stats.daysperhotspot.(region).prctdays.std = std((t ./ d.GroupCount)*100);
+	stats.daysperhotspot.(region).prctdays.min = min((t ./ d.GroupCount)*100);
+	stats.daysperhotspot.(region).prctdays.max = max((t ./ d.GroupCount)*100);
 
-% Tunisian Plateau/Gulf of Sidra
-
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 5);
-stats.daysperhotspot.TunisianSidra.nodays.mean = mean(t);
-stats.daysperhotspot.TunisianSidra.nodays.std = std(t);
-stats.daysperhotspot.TunisianSidra.nodays.min = min(t);
-stats.daysperhotspot.TunisianSidra.nodays.max = max(t);
-
-% % of total deployment
-stats.daysperhotspot.TunisianSidra.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.TunisianSidra.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.TunisianSidra.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.TunisianSidra.prctdays.max = max((t./d.GroupCount)*100);
-
-clear t
-
-% Aegean Sea
-
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 6);
-stats.daysperhotspot.Aegean.nodays.mean = mean(t);
-stats.daysperhotspot.Aegean.nodays.std = std(t);
-stats.daysperhotspot.Aegean.nodays.min = min(t);
-stats.daysperhotspot.Aegean.nodays.max = max(t);
-
-% % of total deployment
-stats.daysperhotspot.Aegean.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.Aegean.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.Aegean.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.Aegean.prctdays.max = max((t./d.GroupCount)*100);
-
-clear t
-
-% Levantine Sea
-
-% # of days
-t = stats.daysperhotspot.Counts.GroupCount(stats.daysperhotspot.Counts.Region == 7);
-stats.daysperhotspot.Levantine.nodays.mean = mean(t);
-stats.daysperhotspot.Levantine.nodays.std = std(t);
-stats.daysperhotspot.Levantine.nodays.min = min(t);
-stats.daysperhotspot.Levantine.nodays.max = max(t);
-
-% % of total deployment
-stats.daysperhotspot.Levantine.prctdays.mean = mean((t./d.GroupCount)*100);
-stats.daysperhotspot.Levantine.prctdays.std = std((t./d.GroupCount)*100);
-stats.daysperhotspot.Levantine.prctdays.min = min((t./d.GroupCount)*100);
-stats.daysperhotspot.Levantine.prctdays.max = max((t./d.GroupCount)*100);
-
-clear t
-
-%% Clear
+end
 
 clear d
 clear id
