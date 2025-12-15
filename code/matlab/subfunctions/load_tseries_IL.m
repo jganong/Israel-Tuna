@@ -127,16 +127,11 @@ end
 	CENSUS.TSERIES_TRIMMED(i) = height(tmp); % in case we bail out 
 
 
-	% SSM sometimes has 4 locatons per day, but only the Date is given in SSM.Date, not the time,
-	% which means there can be 4 rows with duplicate Dates, which breaks interp1
-	% so we discard any rows that repeat Dates
-	[~,ia]= unique(SSM(:,{'TOPPID','Date'}));
-	SSM=SSM(ia,:);
-
 	if sum(mask) < 2
 		disp([ num2str(row.toppID) 'cannot interpolate with less than 2 SSM locations']);
 		continue;
 	end
+
         tmp.Longitude = interp1(datenum(SSM.Date(mask)),...
             SSM.Longitude(mask),datenum(tmp.DateTime));
 

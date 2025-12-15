@@ -47,8 +47,15 @@ for i = 1:height(META)
 
 
     date_rm = min(cell2mat(dates));
-
     tmp(tmp.Date >= date_rm,:) = [];
+
+
+    % SSM sometimes has 4 locatons per day, but only the Date is given in SSM.Date, not the time,
+    % which means there can be 4 rows with duplicate Dates, which breaks interp1
+    % so we discard any rows that repeat Dates
+    [~,ia]= unique(tmp(:,'Date'));
+    tmp=tmp(ia,:);
+
     SSM{i}=tmp;
         CENSUS.SSM_TRIMMED(i)=height(tmp);
 end
