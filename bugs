@@ -1,5 +1,42 @@
+The turkey_metadata_2025july15.csv file has gone through 3 revisons,
+which needs review by Eyal the author,
+to decide if these deployments can just be dropped:
+
+turkey_metadata_2025july15.csv_version_1, the original had 22 rows.
+turkey_metadata_2025july15.csv_version_2, by Eyal, had 17 rows dropping 5 problematic deployments.
+turkey_metadata_2025july15.csv_version_3, by James, has 15 rows, dropping 2 following deployments:
+
+	512201400 # no SSM
+
+	512404800 # gets an error in code/R/IsrealTuna_99CI.R
+
+================================================================================
+
 The last script in IsraelTuna.m is calculate_time_in_Med_regions_IL.m which calculates stats.daysperhotspot:
 I think the numbers in stats.daysperhotspot may be wrong.
 But it might not matter, because it appears that stats.daysperhotspot is never used in the other scripts.
+Here is the error, which needs to be investigated further if stats.daysperhotspot is going to be used.
+Note that it might run without error but erroneously if the number of TOPPIDs == number of Regions,
+and no Region is empty.
+
+>> calculate_time_in_Med_regions_IL
+Error using ./
+Arrays have incompatible sizes for this operation.
+
+Error in calculate_time_in_Med_regions_IL (line 30)
+stats.daysperhotspot.Alboran.prctdays.mean = mean((t./d.GroupCount)*100);
+                                                    ^
+ 
+>> size(t)
+
+ans =
+
+     0     1
+
+>> size(d.GroupCount)
+
+ans =
+
+    13     1
 
 
