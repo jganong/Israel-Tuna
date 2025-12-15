@@ -8,13 +8,17 @@ turkey_metadata_2025july15.csv_version_3, by James, has 15 rows, dropping 2 foll
 
 	512201400 # no SSM
 
-	512404800 # gets an error in code/R/IsrealTuna_99CI.R
+	512404801 # gets an error in code/R/IsrealTuna_99CI.R, this script only uses the 
+	raw output file from the SSM, so the bug is presumably in the SSM itself.
 
 ================================================================================
 
 The last script in IsraelTuna.m is calculate_time_in_Med_regions_IL.m which calculates stats.daysperhotspot:
 I think the numbers in stats.daysperhotspot may be wrong.
 But it might not matter, because it appears that stats.daysperhotspot is never used in the other scripts.
+On the other hand, if you do use stats.daysperhotspot in your paper's
+analysis, it may have incorrect results for the work previously done
+on non-Turkey tuna.
 Here is the error, which needs to be investigated further if stats.daysperhotspot is going to be used.
 Note that it might run without error but erroneously if the number of TOPPIDs == number of Regions,
 and no Region is empty.

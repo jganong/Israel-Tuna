@@ -1,9 +1,3 @@
-write bugs file
-
-decide if the original calculate_time_in_Med_regions_IL.m code was bogusoid 
-
-quite down other number runs with ";"
-
 clean up history by:
      creating a new repo
      import from Camille version
@@ -15,6 +9,8 @@ clean up history by:
      This should result in a version with a simple one step history and a simple diff indented Camille
 
 add it Eyal's regions, names, colors, apply to all _load_ scripts. delete workspace and rerun
+
+check for places where number of regions is assumed to be fixed (eg cmap = hsv(8)
 
 revise logic for outside of med -- perhaps use polygon union?
 
@@ -47,3 +43,6 @@ plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/C
 
 *done* quiet down the 'Black' 1 1 1 1 1 ... from calculate_time_in_Med_regions_IL.m
 
+*punted* decide if the original calculate_time_in_Med_regions_IL.m code was bogusoid 
+
+*done* write bugs file
