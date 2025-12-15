@@ -1,4 +1,6 @@
-quiet down the 'Black' 1 1 1 1 1 ... and decide if the original code was bogusoid 
+write bugs file
+
+decide if the original calculate_time_in_Med_regions_IL.m code was bogusoid 
 
 quite down other number runs with ";"
 
@@ -42,3 +44,6 @@ plot_individual_tracks_Med_with_regions_IL.m:    cd('/Users/cpagniello/Library/C
 *done* deal with large file problem by deleting somehow data files erroneously added 
 
 *done* finish getting all plots to run
+
+*done* quiet down the 'Black' 1 1 1 1 1 ... from calculate_time_in_Med_regions_IL.m
+

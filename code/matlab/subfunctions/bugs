@@ -1,0 +1,5 @@
+The last script in IsraelTuna.m is calculate_time_in_Med_regions_IL.m which calculates stats.daysperhotspot:
+I think the numbers in stats.daysperhotspot may be wrong.
+But it might not matter, because it appears that stats.daysperhotspot is never used in the other scripts.
+
+
