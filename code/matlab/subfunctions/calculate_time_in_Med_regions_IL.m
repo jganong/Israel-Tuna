@@ -19,7 +19,7 @@ region_names= fieldnames(regions);
 
 for region_index = 1 : length(region_names)
 
-	region = region_names{region_index}
+	region = region_names{region_index};
 
 	% note that even with IncludeEmptyGroups = true,
 	% if there is no data in a region there will be no entry!
@@ -37,8 +37,6 @@ for region_index = 1 : length(region_names)
 
 
 		count= sum(toppid_and_region_mask);
-
-		disp(count);
 
 		if count 
 			% there is some data in this region for this toppid
