@@ -17,12 +17,20 @@ TSERIES=cell(height(META),1); % empty placeholder cell array to hold tables
 for i = 1:height(META)
     row=META(i,:);
 
-    file=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
+    % sometimes the *-Series file is in a subdir of PAT/{toppid}, and other times PAT/popup/{toppid}*
+    file1=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
+    file2=strcat('/TOPP/Tuna/ABFT/Recovery/PAT/popup/',string(row.toppID),'_',row.tagnumber, '/processing/',string(row.toppID),'_',row.tagnumber,'-Series.csv');
+    
+if exist(file1,'file')
+	file=file1;
+else
+	file=file2;
+end
 
     % file is dervied from META so no need to skip files not in META
     % (there are none, because we are starting from META))
     %
-    % BUT CONVERSELY, THERE ARE SOME ROWS IN META WITH NO DC FILE,
+    % BUT CONVERSELY, THERE ARE SOME ROWS IN META WITH NO *-Series.csv FILE,
     % SO WE HAVE TO DO THE REVERSE CHECK
 
     if exist(file,'file')
@@ -117,6 +125,14 @@ for i = 1:height(META)
         %% Interpolate SSM positions to match tmp data.
 	mask = SSM.TOPPID == row.toppID;
 	CENSUS.TSERIES_TRIMMED(i) = height(tmp); % in case we bail out 
+
+
+	% SSM sometimes has 4 locatons per day, but only the Date is given in SSM.Date, not the time,
+	% which means there can be 4 rows with duplicate Dates, which breaks interp1
+	% so we discard any rows that repeat Dates
+	[~,ia]= unique(SSM(:,{'TOPPID','Date'}));
+	SSM=SSM(ia,:);
+
 	if sum(mask) < 2
 		disp([ num2str(row.toppID) 'cannot interpolate with less than 2 SSM locations']);
 		continue;
