@@ -4,14 +4,19 @@ to decide if these deployments can just be dropped:
 
 turkey_metadata_2025july15.csv_version_1, the original had 22 rows.
 turkey_metadata_2025july15.csv_version_2, by Eyal, had 17 rows dropping 5 problematic deployments.
-turkey_metadata_2025july15.csv_version_3, by James, has 14 rows, dropping 3 following deployments:
+turkey_metadata_2025july15.csv_version_3, by James, has 12 rows, dropping 5 following deployments:
 
 	512201400 # no SSM
 
 	512201100 # no SSM
 
 	512404801 # gets an error in code/R/IsrealTuna_99CI.R, this script only uses the 
-	raw output file from the SSM, so the bug is presumably in the SSM itself.
+	# raw output file from the SSM, so the bug is presumably in the SSM itself.
+
+	512404800 # same fish as above?  no file in data/raw_output/
+
+	512202300 # *-Series.csv file is empty
+
 
 ================================================================================
 
