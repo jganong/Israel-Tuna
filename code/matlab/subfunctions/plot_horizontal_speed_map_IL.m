@@ -20,7 +20,7 @@ for i = 1:height(META)
     Latitude = tmp.lat(1:end-1);
     Longitude = tmp.lon(1:end-1);
     Date = tmp.date(1:end-1);
-    toppID 	= Latitude % placeholder copy
+    toppID 	= Latitude; % placeholder copy
     toppID(:)= row.toppID; % fill in the placeholder values with toppID
     tbl{i} = table(toppID,Distance_km,Speed_m_per_s,Latitude,Longitude,Date);
 
