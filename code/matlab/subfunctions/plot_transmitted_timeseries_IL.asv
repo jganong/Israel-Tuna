@@ -1,5 +1,5 @@
 %% plot_transmitted_timeseries_IL.m
-% Sub-function of IsraelTuna.m; plots temperature-depth timeseries with
+% Sub-function of IsraelTuna.m; plots temperature-depth timeseries with 
 % hotspots location for transmitted tags.
 
 %% Loop through each tag
@@ -39,7 +39,7 @@ for i = 1:length(toppID)
 
     tmp = TSERIES.DateTime(TSERIES.TOPPID == toppID(i));
     xlimit = [datetime(double(year(tmp(1))),05,30) datetime(double(year(tmp(1)))+1,05,30)];
-
+    
     if all(isfinite(xlimit))
 
         xlimit.TimeZone = 'UTC';
@@ -92,8 +92,9 @@ for i = 1:length(toppID)
         clear m
 
         close gcf
-    end
+
     end
     clear i
     clear toppID
     clear l m p
+end

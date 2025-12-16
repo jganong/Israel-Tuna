@@ -1,4 +1,5 @@
 eventid,tagnumber,ptt,taggingdate,seriesname,deploylat,deploylon,length,length_type,popdate,poplat,poplon,recdate,reclat,reclon,recovered,archivaldata,tagmodel,manufacturer,sample_rate,date_last_depth,date_last_light,date_last_itemp,date_last_etemp,date_last_lon,stock,timezone_correction,tagowner,project
+512202300,21P2001,233954,6/7/2022,Turkey 2022,36.65,30.6,123,CFL,10/26/2022,34.7845,33.8456,,,,,,miniPAT,Wildlife,,,,,,,MED,,ICCAT,ICCAT
 512402900,23P2678,244352,6/8/2024,Turkey 2024,36.48,31.808,214,CFL,1/5/2025,51.2426,-43.8701,,,,,,miniPAT,Wildlife,,,,,,,MED,,ICCAT,ICCAT
 512403000,24P0058,265519,6/8/2024,Turkey 2024,36.48,31.808,227,CFL,6/9/2025,46.27,-5.014,,,,,,miniPAT,Wildlife,,,,,,,MED,,ICCAT,ICCAT
 512403100,24P0111,265525,6/8/2024,Turkey 2024,36.48,31.808,273,CFL,6/9/2025,36.5672,28.2263,,,,,,miniPAT,Wildlife,,,,,,,MED,,ICCAT,ICCAT

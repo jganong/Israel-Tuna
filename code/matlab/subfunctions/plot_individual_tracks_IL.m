@@ -18,7 +18,7 @@ for t = 1:length(toppID)
 
     %% Set projection of map.
 
-    LATLIMS = [15 50]; LONLIMS = [-85 40];
+    LATLIMS = [15 60]; LONLIMS = [-85 40];
     if t == length(toppID)
         LATLIMS = [15 70]; LONLIMS = [-85 40];
     end
