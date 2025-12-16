@@ -13,8 +13,6 @@ files = dir('*MinMaxDepth.csv');
 
 for i = 1:length(files)
 
-    disp(i)
-
     if ismember(str2double(files(i).name(1:7)),META.toppID) == 0
         continue
     end

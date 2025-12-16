@@ -1,3 +1,7 @@
+figure out xyris problems: restore systemd service, put xyris in backup rotation
+
+quiet down more chatter
+
 clean up history by:
      creating a new repo
      import from Camille version

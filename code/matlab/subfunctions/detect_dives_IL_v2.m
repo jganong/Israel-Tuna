@@ -10,8 +10,6 @@ for i = 1:length(toppID)
 
     %% Get subset of data for toppID.
 
-    disp(i);
-
     sub = PSAT(PSAT.TOPPID == toppID(i),:);
 
     %% Calculate sampling rate.

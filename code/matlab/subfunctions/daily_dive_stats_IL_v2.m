@@ -108,7 +108,6 @@ disp('Compute daily time in mesopelagic...')
 SSM.TimeinMeso = NaN(height(SSM),1);
 
 for j = 1:height(SSM)
-    disp(j)
     if ismember(SSM.TOPPID(j),toppID)
         ind_time = find(PSAT.Date == SSM.Date(j));
         ind_topp = find(PSAT.TOPPID == SSM.TOPPID(j));
